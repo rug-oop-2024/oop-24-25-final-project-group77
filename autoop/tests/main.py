@@ -1,4 +1,3 @@
-
 import unittest
 from autoop.tests.test_database import TestDatabase
 from autoop.tests.test_storage import TestStorage
