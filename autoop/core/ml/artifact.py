@@ -15,7 +15,7 @@ class Artifact(BaseModel):
 
     @property
     def id(self) -> str:
-        """ 
+        """
         Get the id of the artifact
         :returns: str: The id of the artifact
         """
@@ -33,4 +33,4 @@ class Artifact(BaseModel):
         """
         os.makedirs(os.path.dirname(self.asset_path), exist_ok=True)
         with open(self.asset_path, 'wb') as file:
-            file.write(self.data)
+            pickle.dump(self.data, file)
