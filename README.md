@@ -1,3 +1,4 @@
+
 # AutOOP your first AutoML library
 
 🎉🥳 Congratulations on making it to this final project! We are excited to see what you can do.
@@ -60,7 +61,7 @@ You can try implementing the one of the following, we will give a max of 2 point
 * Support target types of image, text, video, audio.
 * Support time-series data (with the aforementioned column types) where a user can choose the time column.
 * Support what-if analysis (e.g., user can change the input and see the output).
-* Support metric optimization (e.g., select certain inputs to be adjusted to maximise the target column (e.g., maximise conversion).
+* Support metric optimization (e.g., select certain inputs to be adjusted to maximise the target column (e.g., maximise conversion)).
 * Create a prediction code generator for a specific model.
 * Auto hyperparameter search/tuning.
 

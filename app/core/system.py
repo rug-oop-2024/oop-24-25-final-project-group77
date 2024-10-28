@@ -16,6 +16,7 @@ class ArtifactRegistry():
     def register(self, artifact: Artifact):
         # save the artifact in the storage
         self._storage.save(artifact.data, artifact.asset_path)
+        print("successfully registered artifact") # test
         # save the metadata in the database
         entry = {
             "name": artifact.name,
@@ -25,8 +26,9 @@ class ArtifactRegistry():
             "metadata": artifact.metadata,
             "type": artifact.type,
         }
-        self._database.set(f"artifacts", artifact.id, entry)
-    
+        print("Registering entry:", entry)  # Debugging
+        self._database.set(f"artifacts", artifact.id, entry) # doesnt work
+
     def list(self, type: str=None) -> List[Artifact]:
         entries = self._database.list("artifacts")
         artifacts = []
@@ -56,12 +58,12 @@ class ArtifactRegistry():
             data=self._storage.load(data["asset_path"]),
             type=data["type"],
         )
-    
+
     def delete(self, artifact_id: str):
         data = self._database.get("artifacts", artifact_id)
         self._storage.delete(data["asset_path"])
         self._database.delete("artifacts", artifact_id)
-    
+
 
 class AutoMLSystem:
     _instance = None
