@@ -11,6 +11,7 @@ import numpy as np
 
 
 class Pipeline:
+    """ The class representing the pipeline"""
     def __init__(
         self,
         metrics: List[Metric],
@@ -19,7 +20,8 @@ class Pipeline:
         input_features: List[Feature],
         target_feature: Feature,
         split=0.8,
-    ):
+    ) -> None:
+        """ Initialize the pipeline """
         self._dataset = dataset
         self._model = model
         self._input_features = input_features
@@ -37,25 +39,32 @@ class Pipeline:
                 "Model type must be regression for continuous target feature"
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """ Return a string representation of the object."""
         return f"""
-Pipeline(
-    model={self._model.type},
-    input_features={list(map(str, self._input_features))},
-    target_feature={str(self._target_feature)},
-    split={self._split},
-    metrics={list(map(str, self._metrics))},
-)
-"""
+            Pipeline(
+                model={self._model.type},
+                input_features={list(map(str, self._input_features))},
+                target_feature={str(self._target_feature)},
+                split={self._split},
+                metrics={list(map(str, self._metrics))},
+            )
+            """
 
     @property
-    def model(self):
+    def model(self) -> Model:
+        """
+        Returns the given model.
+        Isn't copied as was implemented before.
+        """
         return self._model
 
     @property
     def artifacts(self) -> List[Artifact]:
-        """Used to get the artifacts generated during the pipeline
-          execution to be saved"""
+        """
+        Used to get the artifacts generated during the pipeline
+        execution to be saved.
+        """
         artifacts = []
         for name, artifact in self._artifacts.items():
             artifact_type = artifact.get("type")
@@ -80,10 +89,12 @@ Pipeline(
         )
         return artifacts
 
-    def _register_artifact(self, name: str, artifact):
+    def _register_artifact(self, name: str, artifact) -> None:
+        """ Register an artifact in the pipeline. """
         self._artifacts[name] = artifact
 
-    def _preprocess_features(self):
+    def _preprocess_features(self) -> None:
+        """ Preprocess the features in the pipeline. """
         (target_feature_name, target_data, artifact) = preprocess_features(
             [self._target_feature], self._dataset
         )[0]
@@ -97,8 +108,8 @@ Pipeline(
         self._input_vectors = [data for (feature_name, data, artifact)
                                in input_results]
 
-    def _split_data(self):
-        # Split the data into training and testing sets
+    def _split_data(self) -> None:
+        """ Split the data into training and testing sets. """
         split = self._split
         self._train_X = [
             vector[:int(split * len(vector))] for vector in self._input_vectors
@@ -112,14 +123,17 @@ Pipeline(
                                                len(self._output_vector)):]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
+        """ Compact the vectors into a single array. """
         return np.concatenate(vectors, axis=1)
 
-    def _train(self):
+    def _train(self) -> None:
+        """ Train the model. """
         X = self._compact_vectors(self._train_X)
         Y = self._train_y
         self._model.fit(X, Y)
 
-    def _evaluate(self):
+    def _evaluate(self) -> None:
+        """ Evaluate the model. """
         X_test = self._compact_vectors(self._test_X)
         X_train = self._compact_vectors(self._train_X)
         Y_test = self._test_y
@@ -135,7 +149,8 @@ Pipeline(
                                           metric, result_test))
         self._predictions = predictions
 
-    def execute(self):
+    def execute(self) -> dict:
+        """ Execute the pipeline. """
         self._preprocess_features()
         self._split_data()
         self._train()
