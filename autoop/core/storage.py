@@ -6,7 +6,7 @@ from glob import glob
 
 class NotFoundError(Exception):
     """ Raise an exception if the path does not exist. """
-    def __init__(self, path) -> None:
+    def __init__(self, path: str) -> None:
         """ Raise an exception if the path does not exist. """
         super().__init__(f"Path not found: {path}")
 

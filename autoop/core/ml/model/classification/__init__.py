@@ -1,3 +1,7 @@
+"""
+This package contains all classification models.
+"""
+
 from autoop.core.ml.model.classification.multiple_logistic_regressor \
     import MultipleLogisticRegressor
 from autoop.core.ml.model.classification.support_vector_machine \

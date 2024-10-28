@@ -21,7 +21,7 @@ class KNearestNeighbors(Model):
         self.k = self._validate_k(k)
         super().__init__(type="classification")
 
-    def _validate_k(cls, v) -> int:
+    def _validate_k(self, v: int) -> int:
         """ Validate k to ensure that it is an int larger than 0. """
         if not isinstance(v, int):
             print('K must be an integer. Setting to default value 3')

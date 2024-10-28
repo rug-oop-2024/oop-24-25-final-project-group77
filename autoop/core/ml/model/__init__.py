@@ -1,3 +1,5 @@
+""" This package contains all models. """
+
 from autoop.core.ml.model.model import Model
 from autoop.core.ml.model.regression import MultipleLinearRegression
 from autoop.core.ml.model.regression import Lasso

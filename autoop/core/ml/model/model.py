@@ -1,12 +1,13 @@
 from abc import abstractmethod, ABC
 from copy import deepcopy
-
+# from autoop.core.ml.artifact import Artifact
 import numpy as np
 
 
 class Model(ABC):
     """Base class for all models used in the assignment."""
-    def __init__(self, type: str = None):
+    def __init__(self, type: str = None) -> None:
+        """Initialize the Model class by creating the artifact"""
         self._parameters: dict = {}
         self._type = type
 
