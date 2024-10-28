@@ -10,5 +10,5 @@ class Feature(BaseModel):
     )
 
     def __str__(self) -> str:
-        """" Return a string representation of the object."""
+        """ Return a string representation of the object."""
         return f"Feature name={self.name}, type={self.type}"

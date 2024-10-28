@@ -5,6 +5,7 @@ import os
 
 
 class Artifact(BaseModel):
+    """ A class to represent an ML artifact"""
     name: str = Field(title="Name of the asset")
     asset_path: str = Field(title="Path to the asset")
     version: str = Field(title="Version of the asset")

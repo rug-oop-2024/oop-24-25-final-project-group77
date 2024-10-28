@@ -27,7 +27,7 @@ class Metric(ABC):
         of the same size.
         """
         if not isinstance(y_true, np.ndarray) or not isinstance(
-                                                    y_pred, np.ndarray):
+                y_pred, np.ndarray):
             raise ValueError("both y_true and y_pred must be numpy arrays")
         if y_true.shape != y_pred.shape:
             print(y_true.shape, y_pred.shape)
@@ -35,7 +35,7 @@ class Metric(ABC):
         return self._calculate(y_true, y_pred)
 
     @property
-    def task_type(self):
+    def task_type(self) -> str:
         """ Getter for the task type """
         return self._task_type
 
@@ -199,7 +199,7 @@ METRICS_DICT = {
 
 
 def get_metric(name: str) -> Metric:
-    # Factory function to get a metric by name.
+    """ Factory function to get a metric by name."""
     if name not in METRICS:
         print(f"Metric {name} is not yet implemented.")
         return None
