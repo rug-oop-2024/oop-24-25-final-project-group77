@@ -21,12 +21,6 @@ class Artifact(BaseModel):
         """
         base64_asset_path = base64.b64encode(self.asset_path.encode()).decode()
         return f"{base64_asset_path}:{self.version}"
-    # what the fuck is that class even doing XDDD
-    # to figure out: how to know which path to read/save to
-    # how this should generally work to ensure anything is saved in the right place
-    # and with the right type 
-    # how can this work as is done in the pipeline.py and dataset.py
-    # and wtf is that lol just use csv files or a proper dataset
 
     def read(self) -> bytes:
         """ Read data from a given path """
@@ -40,16 +34,3 @@ class Artifact(BaseModel):
         os.makedirs(os.path.dirname(self.asset_path), exist_ok=True)
         with open(self.asset_path, 'wb') as file:
             file.write(self.data)
-
-
-    @classmethod
-    def from_serializable(cls, name: str, data: object, version: str = "1.0.0", 
-                          tags: list = None) -> 'Artifact':
-        """ Create an artifact from a serializable object """
-        serialized_data = pickle.dumps(data)
-        return cls(asset_path=name, data=serialized_data, version=version, 
-                   tags=tags or [], type="generic")
-
-    def to_serializable(self) -> object:
-        """ Convert artifact data back to a serializable object """
-        return pickle.loads(self.data)
