@@ -1,6 +1,5 @@
 from abc import abstractmethod, ABC
 from copy import deepcopy
-#from autoop.core.ml.artifact import Artifact
 
 import numpy as np
 
@@ -27,7 +26,7 @@ class Model(ABC):
     def parameters(self) -> dict:
         """ Returns a copy of parameters to prevent leakage. """
         return deepcopy(self._parameters)
-    
+
     @property
     def type(self) -> str:
         """ Returns the model type. """
