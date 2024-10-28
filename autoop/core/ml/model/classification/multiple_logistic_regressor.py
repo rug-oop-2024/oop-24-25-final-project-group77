@@ -24,11 +24,11 @@ class MultipleLogisticRegressor(Model):
         :param penalty: Type of regularization
         :param C: Inverse of regularization strength
         """
-        C, penalty = self.validate_parameters(C, penalty)
+        C, penalty = self._validate_parameters(C, penalty)
         self._model = LogisticRegression(penalty=penalty, C=C)
         super().__init__(type="classification")
 
-    def validate_parameters(
+    def _validate_parameters(
         self,
         C: float,
         penalty: Literal['l1', 'l2', 'elasticnet', 'none']
@@ -53,6 +53,14 @@ class MultipleLogisticRegressor(Model):
             penalty = 'l2'
 
         return C, penalty
+
+    @property
+    def validate_parameters(self) -> int:
+        """
+        Getter for the validator so that the user can check the allowed range.
+        Returns a deepcopy as functions are mutable.
+        """
+        return deepcopy(self._validate_parameters)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

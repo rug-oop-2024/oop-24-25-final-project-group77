@@ -32,15 +32,15 @@ class XGBRegressor(Model):
         decided to reimplement checking for parameter values.
         """
         max_depth, learning_rate, n_estimators, gamma = \
-            self.validate_parameters(max_depth, learning_rate, n_estimators,
-                                     gamma)
+            self._validate_parameters(max_depth, learning_rate, n_estimators,
+                                      gamma)
         self._model = WrappedXGBRegressor(max_depth=max_depth,
                                           learning_rate=learning_rate,
                                           n_estimators=n_estimators,
                                           gamma=gamma)
         super().__init__(type="regression")
 
-    def validate_parameters(
+    def _validate_parameters(
         max_depth: int,
         learning_rate: float,
         n_estimators: int,
@@ -84,6 +84,14 @@ class XGBRegressor(Model):
             gamma = 0.0
 
         return max_depth, learning_rate, n_estimators, gamma
+
+    @property
+    def validate_parameters(self) -> int:
+        """
+        Getter for the validator so that the user can check the allowed range.
+        Returns a deepcopy as functions are mutable.
+        """
+        return deepcopy(self._validate_parameters)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

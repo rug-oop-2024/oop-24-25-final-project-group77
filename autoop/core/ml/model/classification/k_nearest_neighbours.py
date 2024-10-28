@@ -1,5 +1,6 @@
 import numpy as np
 from collections import Counter
+from copy import deepcopy
 import os
 import sys
 
@@ -17,10 +18,10 @@ class KNearestNeighbors(Model):
         Initialize the KNN model with various hyperparameters,
         including the number of nearest neighbours.
         """
-        self.k = self.validate_k(k)
+        self.k = self._validate_k(k)
         super().__init__(type="classification")
 
-    def validate_k(cls, v) -> int:
+    def _validate_k(cls, v) -> int:
         """ Validate k to ensure that it is an int larger than 0. """
         if not isinstance(v, int):
             print('K must be an integer. Setting to default value 3')
@@ -29,6 +30,28 @@ class KNearestNeighbors(Model):
             print('k must be > 0. Setting to default value 3')
             v = 3
         return v
+
+    @property
+    def k(self) -> int:
+        """ Getter for the number of nearest neighbours. """
+        return self._k
+
+    @k.setter
+    def k(self, v: int) -> None:
+        """
+        Setter for the number of nearest neighbours.
+        This is the only model that allows a hyperparameter to be set by
+        the user, as this paramater is not used in training.
+        """
+        self._k = self._validate_k(v)
+
+    @property
+    def validate_k(self) -> int:
+        """
+        Getter for the validator so that the user can check the allowed range.
+        Returns a deepcopy as functions are mutable.
+        """
+        return deepcopy(self._validate_k)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """
