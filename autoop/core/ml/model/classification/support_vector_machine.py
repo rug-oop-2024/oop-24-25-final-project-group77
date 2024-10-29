@@ -29,7 +29,8 @@ class SVMClassifier(Model):
         C, kernel, degree, gamma = self._validate_parameters(C, kernel, degree,
                                                              gamma)
         self._model = SVC(C=C, kernel=kernel, degree=degree, gamma=gamma)
-        super().__init__(type="classification")
+        super().__init__(type="classification",
+                         name="Support Vector Machine")
 
     def _validate_parameters(
         self,

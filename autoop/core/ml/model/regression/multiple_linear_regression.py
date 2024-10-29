@@ -16,7 +16,8 @@ class MultipleLinearRegression(Model):
     """
     def __init__(self) -> None:
         """ Initialize the model. """
-        super().__init__(type="regression")
+        super().__init__(type="regression",
+                         name="MultipleLinearRegression")
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

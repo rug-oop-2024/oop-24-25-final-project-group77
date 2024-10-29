@@ -19,7 +19,8 @@ class KNearestNeighbors(Model):
         including the number of nearest neighbours.
         """
         self.k = self._validate_k(k)
-        super().__init__(type="classification")
+        super().__init__(type="classification",
+                         name="K-Nearest Neighbours")
 
     def _validate_k(self, v: int) -> int:
         """ Validate k to ensure that it is an int larger than 0. """

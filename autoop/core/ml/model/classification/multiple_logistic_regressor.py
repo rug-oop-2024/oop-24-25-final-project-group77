@@ -26,7 +26,8 @@ class MultipleLogisticRegressor(Model):
         """
         C, penalty = self._validate_parameters(C, penalty)
         self._model = LogisticRegression(penalty=penalty, C=C)
-        super().__init__(type="classification")
+        super().__init__(type="classification",
+                         name="Multiple Logistic Regression")
 
     def _validate_parameters(
         self,
