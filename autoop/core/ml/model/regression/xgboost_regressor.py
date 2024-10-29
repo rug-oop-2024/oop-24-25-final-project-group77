@@ -38,8 +38,7 @@ class XGBRegressor(Model):
                                           learning_rate=learning_rate,
                                           n_estimators=n_estimators,
                                           gamma=gamma)
-        super().__init__(type="regression",
-                         name="xgboost_regressor")
+        super().__init__(type="regression")
 
     def _validate_parameters(
         max_depth: int,

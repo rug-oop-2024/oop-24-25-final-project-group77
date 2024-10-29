@@ -22,8 +22,7 @@ class Lasso(Model):
         """
         alpha = self._validate_alpha(alpha)
         self._model = WrappedLasso(alpha=alpha)
-        super().__init__(type="regression",
-                         name="Lasso")
+        super().__init__(type="regression")
 
     def _validate_alpha(self, alpha: float) -> float:
         """
