@@ -26,10 +26,12 @@ class SVMClassifier(Model):
         :param degree: Degree of polynomial kernel
         :param gamma: Kernel coefficient
         """
+        super().__init__(type="classification")
         C, kernel, degree, gamma = self._validate_parameters(C, kernel, degree,
                                                              gamma)
         self._model = SVC(C=C, kernel=kernel, degree=degree, gamma=gamma)
-        super().__init__(type="classification")
+        self._hyperparameters = {"C": C, "kernel": kernel, "degree": degree,
+                                 "gamma": gamma}
 
     def _validate_parameters(
         self,
@@ -86,12 +88,9 @@ class SVMClassifier(Model):
         by applying the SVM method .fit
         """
         self._model.fit(observations, ground_truth)
-
         self._parameters = {
             "_intercept": self._model.intercept_,
-            "_support": self._model.support_,
             "_support_vectors": self._model.support_vectors_,
-            "_n_support": self._model.n_support_,
             "_dual_coef": self._model.dual_coef_,
             "_classes": self._model.classes_
         }

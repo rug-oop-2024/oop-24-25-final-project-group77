@@ -20,9 +20,10 @@ class Lasso(Model):
         as defined in the scikit-learn library.
         :param alpha: Regularization strength
         """
+        super().__init__(type="regression")
         alpha = self._validate_alpha(alpha)
         self._model = WrappedLasso(alpha=alpha)
-        super().__init__(type="regression")
+        self._hyperparameters = {"alpha": alpha}
 
     def _validate_alpha(self, alpha: float) -> float:
         """

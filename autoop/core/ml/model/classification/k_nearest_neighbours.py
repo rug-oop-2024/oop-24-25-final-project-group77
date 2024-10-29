@@ -18,8 +18,8 @@ class KNearestNeighbors(Model):
         Initialize the KNN model with various hyperparameters,
         including the number of nearest neighbours.
         """
-        self.k = self._validate_k(k)
         super().__init__(type="classification")
+        self.k = self._validate_k(k)
 
     def _validate_k(self, v: int) -> int:
         """ Validate k to ensure that it is an int larger than 0. """
@@ -44,6 +44,7 @@ class KNearestNeighbors(Model):
         the user, as this paramater is not used in training.
         """
         self._k = self._validate_k(v)
+        self._hyperparameters = {"k": v}
 
     @property
     def validate_k(self) -> int:

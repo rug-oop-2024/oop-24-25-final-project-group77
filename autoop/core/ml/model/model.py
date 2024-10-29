@@ -9,6 +9,7 @@ class Model(ABC):
     def __init__(self, type: str = None) -> None:
         """Initialize the Model class by creating the artifact"""
         self._parameters: dict = {}
+        self._hyperparameters: dict = {}
         self._type = type
 
     @abstractmethod

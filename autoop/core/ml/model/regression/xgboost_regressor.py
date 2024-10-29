@@ -28,9 +28,8 @@ class XGBRegressor(Model):
         :param learning_rate: Learning rate
         :param n_estimators: Number of estimators
         :param gamma: Minimum loss reduction
-        We did not like how XGboost handles error messages, so we
-        decided to reimplement checking for parameter values.
         """
+        super().__init__(type="regression")
         max_depth, learning_rate, n_estimators, gamma = \
             self._validate_parameters(max_depth, learning_rate, n_estimators,
                                       gamma)
@@ -38,7 +37,10 @@ class XGBRegressor(Model):
                                           learning_rate=learning_rate,
                                           n_estimators=n_estimators,
                                           gamma=gamma)
-        super().__init__(type="regression")
+        self._hyperparameters = {"max_depth": max_depth,
+                                 "learning_rate": learning_rate,
+                                 "n_estimators": n_estimators,
+                                 "gamma": gamma}
 
     def _validate_parameters(
         max_depth: int,

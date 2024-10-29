@@ -24,9 +24,10 @@ class MultipleLogisticRegressor(Model):
         :param penalty: Type of regularization
         :param C: Inverse of regularization strength
         """
+        super().__init__(type="classification")
         C, penalty = self._validate_parameters(C, penalty)
         self._model = LogisticRegression(penalty=penalty, C=C)
-        super().__init__(type="classification")
+        self._hyperparameters = {"C": C, "penalty": penalty}
 
     def _validate_parameters(
         self,
