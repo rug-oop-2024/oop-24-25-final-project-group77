@@ -20,18 +20,22 @@ class Artifact(BaseModel):
         Get the id of the artifact
         :returns: str: The id of the artifact
         """
+        # REMOVING THE DOUBLE ==, ANOTHER WINDOWS ISSUE
         base64_asset_path = base64.b64encode(self.asset_path.encode()).decode()
-        return f"{base64_asset_path}:{self.version}"
+        # remove the last two characters
+        base64_asset_path = base64_asset_path[:-2]
+        return f"{base64_asset_path}-{self.version}"
 
     def read(self) -> bytes:
         """ Read data from a given path """
         return self.data
 
-    def save(self) -> None:
+    def save(self, data: bytes) -> None:
         """
         Save the artifact's data to the specified asset path.
         Raises an exception if the directory does not exist.
         """
+        self.data = data
         os.makedirs(os.path.dirname(self.asset_path), exist_ok=True)
         with open(self.asset_path, 'wb') as file:
-            pickle.dump(self.data, file)
+            pickle.dump(self, file)

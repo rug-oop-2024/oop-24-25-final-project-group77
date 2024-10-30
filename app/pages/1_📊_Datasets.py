@@ -21,7 +21,7 @@ if datasets:
                             ds.name == selected_dataset_name)
 
     if st.button("Show Preview"):
-        data = selected_dataset.read() 
+        data = selected_dataset.read()
         st.write(f"Preview of **{selected_dataset_name}**:")
         st.dataframe(data.head())
 
@@ -44,7 +44,7 @@ if uploaded_file:
         data = pd.read_csv(uploaded_file)
 
         asset_path = f"datasets/{uploaded_file.name}"
-        version = "1.0.0"  # Set a default version
+        version = "ohio"  # Set a default version
 
         st.write(f"Dataset name: {uploaded_file.name}")
 
@@ -59,7 +59,7 @@ if uploaded_file:
         st.write(f"Creating dataset with name: {new_dataset.name}")
 
         # Register the new dataset
-        automl.registry.register(new_dataset)  
+        automl.registry.register(new_dataset)
         st.success(f"Uploaded and registered {uploaded_file.name} successfully!")
         st.rerun()  # Change here from experimental_rerun to rerun
     except Exception as e:

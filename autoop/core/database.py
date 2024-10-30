@@ -29,6 +29,7 @@ class Database():
         if not self._data.get(collection, None):
             self._data[collection] = {}
         self._data[collection][id] = entry
+        # the following _persist method also contains temporary fixes
         self._persist()
         return entry
 
@@ -81,6 +82,8 @@ class Database():
             if not data:
                 continue
             for id, item in data.items():
+                # remove the equal signs from the id
+                id = id.replace("=", "")
                 self._storage.save(json.dumps(item).encode(),
                                    f"{collection}{os.sep}{id}")
 
