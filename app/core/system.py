@@ -1,6 +1,5 @@
 from autoop.core.storage import LocalStorage
 from autoop.core.database import Database
-from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.artifact import Artifact
 from autoop.core.storage import Storage
 from typing import List
@@ -59,7 +58,7 @@ class ArtifactRegistry():
             )
             artifacts.append(artifact)
         return artifacts
-    
+
     def get(self, artifact_id: str) -> Artifact:
         data = self._database.get("artifacts", artifact_id)
         return Artifact(
@@ -73,7 +72,7 @@ class ArtifactRegistry():
         )
 
     def delete(self, artifact_id: str):
-        data = self._database.get("artifacts", artifact_id)
+        data = self._database.get("artifacts", artifact_id)  # not wrking
         self._storage.delete(data["asset_path"])
         self._database.delete("artifacts", artifact_id)
 

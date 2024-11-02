@@ -40,16 +40,17 @@ class Pipeline:
             )
 
     def __str__(self) -> str:
-        """ Return a string representation of the object."""
-        return f"""
-            Pipeline(
-                model={self._model.type},
-                input_features={list(map(str, self._input_features))},
-                target_feature={str(self._target_feature)},
-                split={self._split},
-                metrics={list(map(str, self._metrics))},
-            )
-            """
+        input_features_str = "\n    - ".join(map(str, self._input_features))
+        metrics_str = "\n    - ".join(map(str, self._metrics))
+
+        return (
+            f"Pipeline:\n"
+            f"  - Model Type: {self._model.type}\n"
+            f"  - Input Features:\n    - {input_features_str}\n"
+            f"  - Target {self._target_feature}\n"
+            f"  - Train/Test Split: {self._split}\n"
+            f"  - Metrics:\n    - {metrics_str}"
+        )
 
     @property
     def model(self) -> Model:

@@ -43,6 +43,7 @@ class XGBRegressor(Model):
                                  "gamma": gamma}
 
     def _validate_parameters(
+        self,
         max_depth: int,
         learning_rate: float,
         n_estimators: int,

@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 from app.core.system import AutoMLSystem
 from autoop.core.ml.dataset import Dataset
@@ -22,31 +23,48 @@ if datasets:
 
     if st.button("Show Preview"):
         data = selected_dataset.read()
-        st.write(f"Preview of **{selected_dataset_name}**:")
-        st.dataframe(data.head())
+        data_io = io.BytesIO(data)
+        try:
+            df = pd.read_csv(data_io)
+            st.write(df.head())
+        except Exception as e:
+            st.error(f"Error reading data: {e}")
+
+    if 'confirm_delete' not in st.session_state:
+        st.session_state.confirm_delete = False
 
     if st.button("Delete Dataset"):
+        st.session_state.confirm_delete = True
+
+    if st.session_state.confirm_delete:
+        st.error("Once you delete a dataset, "
+                 "it cannot be recovered. Are you sure?")
         if st.button("Confirm Deletion"):
-            automl.registry.delete(selected_dataset)
+            st.write(f"Deleting {selected_dataset_name}")
+            automl.registry.delete(selected_dataset)  # doesnt delete :(
             st.warning(f"Deleted {selected_dataset_name}")
-            st.rerun()  # Change here from experimental_rerun to rerun
+            st.session_state.confirm_delete = False
+            st.rerun()
+
+        if st.button("Cancel"):
+            st.session_state.confirm_delete = False
 
 else:
     st.info("No datasets available in the system. Please upload one.")
 
-# Upload a new dataset
-st.subheader("Upload New Dataset")
+if "upload_success" not in st.session_state:
+    st.session_state.upload_success = False
+
+st.title("Upload New Dataset")
+
 uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
 if uploaded_file:
     try:
-        # Load the uploaded file into a DataFrame
         data = pd.read_csv(uploaded_file)
 
         asset_path = f"datasets/{uploaded_file.name}"
-        version = "ohio"  # Set a default version
-
-        st.write(f"Dataset name: {uploaded_file.name}")
+        version = "ohio"
 
         # Create a new Dataset instance
         new_dataset = Dataset.from_dataframe(
@@ -56,11 +74,14 @@ if uploaded_file:
             version=version
         )
 
-        st.write(f"Creating dataset with name: {new_dataset.name}")
+        if st.button("Confirm Upload"):
+            automl.registry.register(new_dataset)
+            st.success(f"Uploaded and registered {uploaded_file.name} "
+                       "successfully!")
+            st.session_state.upload_success = True
 
-        # Register the new dataset
-        automl.registry.register(new_dataset)
-        st.success(f"Uploaded and registered {uploaded_file.name} successfully!")
-        st.rerun()  # Change here from experimental_rerun to rerun
+            st.session_state.uploaded_file = None
+            st.rerun()
+
     except Exception as e:
         st.error(f"Failed to upload dataset: {e}")
