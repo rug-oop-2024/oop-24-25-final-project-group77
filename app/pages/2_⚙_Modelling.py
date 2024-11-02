@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import io
 
 from autoop.core.ml.model.classification import MultipleLogisticRegressor
@@ -55,6 +56,19 @@ else:
 
 # Step 2: Select Features and Target
 st.subheader("2. Select Features and Target")
+
+# EXTRA FEATURE FOR DEALING WITH NAN VALUES
+df = df.replace(["", "NaN", "None", "null", " ",
+                 "nan", "none"], np.nan).dropna().reset_index(drop=True)
+
+# EXTRA FEATURE FOR DEALING WITH DATETIME CONVERSION
+for col in df.columns:
+    if df[col].dtype == 'object':
+        # try to parse as dateetime, if not then ignore
+        df[col] = pd.to_datetime(df[col], errors='ignore')
+
+### st.write("Data types after conversion:", df.dtypes)
+
 features = list(df.columns)
 
 input_feature_names = st.multiselect("Select input features", features)
@@ -83,19 +97,37 @@ if target_feature.type == "categorical":
 else:
     task_type = "Regression"
 
-# Step 3: Choose Model Type
+# Step 3: Choose Model Type and Set Hyperparameters
 st.subheader("3. Choose Model Type")
 
+# mapping of models with corresponding hyperparameters to be chosen
 model_mapping = {
-    "Multiple Linear Regression": MultipleLinearRegression,
-    "Multiple Logistic Regression": MultipleLogisticRegressor,
-    "K Nearest Neighbours": KNearestNeighbors,
-    "Support Vector Machine": SVMClassifier,
-    "Lasso": Lasso,
-    "XGBoost Regressor": XGBRegressor,
+    "Multiple Linear Regression": (MultipleLinearRegression, {}),
+    "Multiple Logistic Regression": (MultipleLogisticRegressor, {
+        "C": (st.slider, "C", 0.01, 10.0, 1.0, 0.1),
+        "penalty": (st.selectbox, "Penalty", ["l1", "l2",
+                                              "elasticnet", "none"]),
+    }),
+    "K Nearest Neighbours": (KNearestNeighbors, {
+        "k": (st.slider, "K", 1, 10, 3),
+    }),
+    "Support Vector Machine": (SVMClassifier, {
+        "C": (st.slider, "C", 0.01, 10.0, 1.0, 0.1),
+        "kernel": (st.selectbox, "Kernel", ["linear",
+                                            "poly", "rbf", "sigmoid"]),
+        "degree": (st.slider, "Degree", 1, 5, 3, 1)
+    }),
+    "Lasso": (Lasso, {
+        "alpha": (st.slider, "Alpha", 0.0, 10.0, 1.0, 0.5),
+    }),
+    "XGBoost Regressor": (XGBRegressor, {
+        "max_depth": (st.slider, "Max Depth", 1, 15, 6),
+        "learning_rate": (st.slider, "Learning Rate", 0.00, 1.00, 0.1, 0.01),
+        "n_estimators": (st.slider, "Number of Estimators", 0, 500, 100),
+        "gamma": (st.slider, "Gamma", 0.0, 5.0, 0.0, 0.1),
+    }),
 }
 
-# show avaliable models for task type
 if task_type == "Classification":
     model_choices = ["K Nearest Neighbours", "Support Vector Machine",
                      "Multiple Logistic Regression"]
@@ -103,11 +135,23 @@ else:
     model_choices = ["Multiple Linear Regression", "Lasso",
                      "XGBoost Regressor"]
 
+# prompt user to select a model
 model_choice = st.selectbox("Select a model", model_choices)
 
-# institiate selected model
-selected_model_class = model_mapping[model_choice]
-model = selected_model_class()
+selected_model_class, hyperparams = model_mapping[model_choice]
+
+# process hyperparameters
+if hyperparams:
+    st.subheader("Hyperparameter Configuration")
+    chosen_params = {}
+    for param_name, (input_fn, label, *args) in hyperparams.items():
+        chosen_params[param_name] = input_fn(label, *args)
+
+    # intiaize model model with chosen hyperparameters
+    model = selected_model_class(**chosen_params)
+else:
+    # no hyperparameters
+    model = selected_model_class()
 
 
 # Step 4: Configure Split

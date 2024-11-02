@@ -1,0 +1,3 @@
+Additional things added:
+- Ability to handle datasets with NaN values
+- Ability to deal with date-time data 
