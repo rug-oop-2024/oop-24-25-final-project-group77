@@ -41,7 +41,8 @@ if datasets:
                  "it cannot be recovered. Are you sure?")
         if st.button("Confirm Deletion"):
             st.write(f"Deleting {selected_dataset_name}")
-            automl.registry.delete(selected_dataset)  # doesnt delete :(
+            artifact_id = selected_dataset.id
+            automl.registry.delete(artifact_id)  # issue
             st.warning(f"Deleted {selected_dataset_name}")
             st.session_state.confirm_delete = False
             st.rerun()

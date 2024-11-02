@@ -9,9 +9,11 @@ from autoop.core.ml.model.classification import KNearestNeighbors
 from autoop.core.ml.model.regression import MultipleLinearRegression, Lasso
 from autoop.core.ml.model.regression import XGBRegressor
 from autoop.core.ml.feature import Feature
+from autoop.functional.feature import detect_feature_types
 from autoop.core.ml.metric import get_metric
 from autoop.core.ml.pipeline import Pipeline
 from app.core.system import AutoMLSystem
+
 
 
 st.set_page_config(page_title="Modelling", page_icon="📈")
@@ -47,6 +49,8 @@ if datasets:
     data_io = io.BytesIO(data)
     try:
         df = pd.read_csv(data_io)
+        # EXTRA FEATURE FOR DEALING WITH NAN VALUES
+        df = df.replace(r'^\s*$', float('NaN'), regex=True)
         st.write(df.head())  # generate preview for user
     except Exception as e:
         st.error(f"Error reading data: {e}")
@@ -57,17 +61,61 @@ else:
 # Step 2: Select Features and Target
 st.subheader("2. Select Features and Target")
 
+
+def try_convert(value: str) -> float | str:
+    """ Converts values to numeric if possible, otherwise returns as is """
+    try:
+        return pd.to_numeric(value)
+    except ValueError:
+        return value
+
+
+st.session_state.nans_left = False
 # EXTRA FEATURE FOR DEALING WITH NAN VALUES
-df = df.replace(["", "NaN", "None", "null", " ",
-                 "nan", "none"], np.nan).dropna().reset_index(drop=True)
+if df.isna().values.any():
+    st.session_state.nans_left = True
+    for col in df.columns:  # convert to numeric (NaNs hinder type checking)
+        df[col] = df[col].apply(try_convert)
 
-# EXTRA FEATURE FOR DEALING WITH DATETIME CONVERSION
-for col in df.columns:
-    if df[col].dtype == 'object':
-        # try to parse as dateetime, if not then ignore
-        df[col] = pd.to_datetime(df[col], errors='ignore')
+    st.warning(f"There are {df.isna().sum().sum()} NaN values in the dataset. "
+               "What do you want to do with them?")
 
-### st.write("Data types after conversion:", df.dtypes)
+    option = st.selectbox("Select an option", ["keep", "remove",
+                                               "interpolate", "fill with 0"])
+
+    if option == "remove":
+        confirmation = st.button("Confirm removal of NaN values")
+        if confirmation:
+            df = df.dropna().reset_index(drop=True)
+            st.write("Succesfully removed NaN values!")
+        else:
+            st.stop()
+    elif option == "keep":
+        confirmation = st.button("Confirm keeping NaN values")
+        if confirmation:
+            st.write("Keeping NaN values.")
+        else:
+            st.stop()
+    elif option == "interpolate":
+        confirmation = st.button("Confirm linear interpolation")
+        if confirmation:
+            st.write("Interpolating NaN values.")
+            numeric_cols = df.select_dtypes(include=['number']).columns
+            df[numeric_cols] = df[numeric_cols].interpolate(method="linear")
+        else:
+            st.stop()
+    elif option == "fill with 0":
+        confirmation = st.button("Confirm filling NaN values with 0")
+        if confirmation:
+            st.write("Filling NaN values with 0.")
+            df = df.fillna(0)
+        else:
+            st.stop()
+    nans_left = df.isna().sum().sum()
+    st.write(f"Applying this operation left you with {nans_left} NaN values.")
+
+    if nans_left == 0:
+        st.session_state.nans_left = False
 
 features = list(df.columns)
 

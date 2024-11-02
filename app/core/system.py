@@ -72,9 +72,9 @@ class ArtifactRegistry():
         )
 
     def delete(self, artifact_id: str):
-        data = self._database.get("artifacts", artifact_id)  # not wrking
-        self._storage.delete(data["asset_path"])
-        self._database.delete("artifacts", artifact_id)
+        data = self._database.get("artifacts", artifact_id)
+        self._storage.delete(data["asset_path"])   # works properly
+        self._database.delete("artifacts", artifact_id)   # does not work
 
 
 class AutoMLSystem:
