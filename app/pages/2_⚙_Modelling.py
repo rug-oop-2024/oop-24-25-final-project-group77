@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import io
 
 from autoop.core.ml.model.classification import MultipleLogisticRegressor
@@ -9,7 +8,6 @@ from autoop.core.ml.model.classification import KNearestNeighbors
 from autoop.core.ml.model.regression import MultipleLinearRegression, Lasso
 from autoop.core.ml.model.regression import XGBRegressor
 from autoop.core.ml.feature import Feature
-from autoop.functional.feature import detect_feature_types
 from autoop.core.ml.metric import get_metric
 from autoop.core.ml.pipeline import Pipeline
 from app.core.system import AutoMLSystem
@@ -43,16 +41,23 @@ if datasets:
     selected_dataset = next(ds for ds in datasets if
                             ds.name == selected_dataset_name)
 
-    data = selected_dataset.read()
+    # check if a modified dataframe is already in session state
+    if "modified_df" not in st.session_state:
+        data = selected_dataset.read()
+        data_io = io.BytesIO(data)
+        try:
+            original_df = pd.read_csv(data_io)
+            original_df = original_df.replace(r'^\s*$', float(
+                'NaN'), regex=True)
+            st.session_state["original_df"] = original_df
+        except Exception as e:
+            st.error(f"Error reading data: {e}")
+            st.stop()
+
+    # use the modified df if it exists, otherwise fall back to the original
+    df = st.session_state.get("modified_df", st.session_state["original_df"])
     st.write("Dataset preview (first five rows):")
-    data_io = io.BytesIO(data)
-    try:
-        df = pd.read_csv(data_io)
-        # EXTRA FEATURE FOR DEALING WITH NAN VALUES
-        df = df.replace(r'^\s*$', float('NaN'), regex=True)
-        st.write(df.head())  # generate preview for user
-    except Exception as e:
-        st.error(f"Error reading data: {e}")
+    st.write(df.head())
 else:
     st.warning("No datasets available. Please upload one.")
     st.stop()
@@ -106,6 +111,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
             df = df.dropna().reset_index(drop=True)
             confirmation_placeholder.success("Successfully removed NaN"
                                              " values!")
+            st.session_state["modified_df"] = df  # store the modified df
             st.session_state.nan_handling_confirmed = True
             nans_left = df.isna().sum().sum()
             st.session_state.nan_summary = ("\n- Removed all NaN values. "
@@ -123,6 +129,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
                                                        "NaN values")
         if confirmation:
             confirmation_placeholder.success("Keeping NaN values.")
+            st.session_state["modified_df"] = df  # store the modified df
             st.session_state.nan_handling_confirmed = True
             nans_left = df.isna().sum().sum()
             st.session_state.nan_summary = ("\n- Kept all NaN values."
@@ -142,6 +149,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
             confirmation_placeholder.success("Interpolating NaN values.")
             numeric_cols = df.select_dtypes(include=['number']).columns
             df[numeric_cols] = df[numeric_cols].interpolate(method="linear")
+            st.session_state["modified_df"] = df  # store the modified df
             st.session_state.nan_handling_confirmed = True
             nans_left = df.isna().sum().sum()
             st.session_state.nan_summary = (f"\n- Interpolated NaN values "
@@ -159,6 +167,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
         if confirmation:
             confirmation_placeholder.success("Filling NaN values with 0.")
             df = df.fillna(0)
+            st.session_state["modified_df"] = df  # store the modified df
             st.session_state.nan_handling_confirmed = True
             nans_left = df.isna().sum().sum()
             st.session_state.nan_summary = ("\n- Filled all NaN values"
@@ -174,18 +183,18 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
 
 # if we have handled the nan values, show a summary
 if st.session_state.nan_handling_confirmed:
-    retry = st.button("Redo with a different method of NaN Handling")
     st.write(f"#### NaN Handling Summary: {st.session_state.nan_summary}")
 
-    # prompt the user to redo their handling if they want!
-    if retry:
+    # prompt user to do different handling if they want!
+    if st.button("Redo with a different method of NaN Handling"):
         st.session_state.nan_handling_confirmed = False
+        del st.session_state["modified_df"]  # reset the data
         st.rerun()
 
 features = list(df.columns)
 
-st.write("Data types after conversion:")
-st.write(df.dtypes)
+# st.write("Data types after conversion:")
+# st.write(df.dtypes) - useful to check if df is changed/same
 
 input_feature_names = st.multiselect("Select input features", features)
 
@@ -308,6 +317,8 @@ pipeline = Pipeline(
 # print the beautifully formatted summary
 st.subheader("Pipeline Summary​")
 st.write(pipeline.__str__())
+if st.session_state.nan_handling_confirmed:
+    st.write(f"NaN Handling Summary: {st.session_state.nan_summary}")
 
 # Step 7: Train Pipeline
 if st.button("Train Pipeline"):
