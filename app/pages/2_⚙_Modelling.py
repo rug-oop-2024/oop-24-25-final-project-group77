@@ -15,7 +15,6 @@ from autoop.core.ml.pipeline import Pipeline
 from app.core.system import AutoMLSystem
 
 
-
 st.set_page_config(page_title="Modelling", page_icon="📈")
 
 
@@ -70,54 +69,123 @@ def try_convert(value: str) -> float | str:
         return value
 
 
-st.session_state.nans_left = False
 # EXTRA FEATURE FOR DEALING WITH NAN VALUES
-if df.isna().values.any():
-    st.session_state.nans_left = True
-    for col in df.columns:  # convert to numeric (NaNs hinder type checking)
+if "nan_handling_confirmed" not in st.session_state:
+    st.session_state.nan_handling_confirmed = False
+
+if "nan_summary" not in st.session_state:
+    st.session_state.nan_summary = ""
+
+if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
+    # conve
+    for col in df.columns:
         df[col] = df[col].apply(try_convert)
 
-    st.warning(f"There are {df.isna().sum().sum()} NaN values in the dataset. "
-               "What do you want to do with them?")
+    # we use placeholders throughout so that when the user has successfully
+    # dealt with the nan values. the placeholders can be cleared so the section
+    # is cleared so that we can prompt them to redo this step again and start
+    # from scratch with the refreshed dataset (unaltered)
+    # ! its messy but it prevents errors with rerun and users backtracking !
 
-    option = st.selectbox("Select an option", ["keep", "remove",
-                                               "interpolate", "fill with 0"])
+    warning_placeholder = st.empty()
+    warning_placeholder.warning(f"There are {df.isna().sum().sum()}"
+                                " NaN values in the dataset. "
+                                "What do you want to do with them?")
+
+    option_placeholder = st.empty()  # placeholder to clear
+    option = option_placeholder.selectbox("Select an option",
+                                          ["keep", "remove", "interpolate",
+                                           "fill with 0"])
+
+    confirmation_placeholder = st.empty()  # placeholder to clear
 
     if option == "remove":
-        confirmation = st.button("Confirm removal of NaN values")
+        confirmation = confirmation_placeholder.button("Confirm removal of "
+                                                       "NaN values")
         if confirmation:
             df = df.dropna().reset_index(drop=True)
-            st.write("Succesfully removed NaN values!")
+            confirmation_placeholder.success("Successfully removed NaN"
+                                             " values!")
+            st.session_state.nan_handling_confirmed = True
+            nans_left = df.isna().sum().sum()
+            st.session_state.nan_summary = ("\n- Removed all NaN values. "
+                                            "\n - Leaving you with "
+                                            f"{nans_left}"
+                                            " NaN values.")
+            warning_placeholder.empty()
+            option_placeholder.empty()
+            confirmation_placeholder.empty()
         else:
             st.stop()
+
     elif option == "keep":
-        confirmation = st.button("Confirm keeping NaN values")
+        confirmation = confirmation_placeholder.button("Confirm keeping "
+                                                       "NaN values")
         if confirmation:
-            st.write("Keeping NaN values.")
+            confirmation_placeholder.success("Keeping NaN values.")
+            st.session_state.nan_handling_confirmed = True
+            nans_left = df.isna().sum().sum()
+            st.session_state.nan_summary = ("\n- Kept all NaN values."
+                                            "\n- Leaving you with "
+                                            f"{nans_left}"
+                                            " NaN values.")
+            warning_placeholder.empty()
+            option_placeholder.empty()
+            confirmation_placeholder.empty()
         else:
             st.stop()
+
     elif option == "interpolate":
-        confirmation = st.button("Confirm linear interpolation")
+        confirmation = confirmation_placeholder.button("Confirm "
+                                                       "linear interpolation")
         if confirmation:
-            st.write("Interpolating NaN values.")
+            confirmation_placeholder.success("Interpolating NaN values.")
             numeric_cols = df.select_dtypes(include=['number']).columns
             df[numeric_cols] = df[numeric_cols].interpolate(method="linear")
+            st.session_state.nan_handling_confirmed = True
+            nans_left = df.isna().sum().sum()
+            st.session_state.nan_summary = (f"\n- Interpolated NaN values "
+                                            "linearly. \n- Leaving you with"
+                                            f" {nans_left} NaN values.")
+            warning_placeholder.empty()
+            option_placeholder.empty()
+            confirmation_placeholder.empty()
         else:
             st.stop()
-    elif option == "fill with 0":
-        confirmation = st.button("Confirm filling NaN values with 0")
-        if confirmation:
-            st.write("Filling NaN values with 0.")
-            df = df.fillna(0)
-        else:
-            st.stop()
-    nans_left = df.isna().sum().sum()
-    st.write(f"Applying this operation left you with {nans_left} NaN values.")
 
-    if nans_left == 0:
-        st.session_state.nans_left = False
+    elif option == "fill with 0":
+        confirmation = confirmation_placeholder.button("Confirm filling NaN "
+                                                       "values with 0")
+        if confirmation:
+            confirmation_placeholder.success("Filling NaN values with 0.")
+            df = df.fillna(0)
+            st.session_state.nan_handling_confirmed = True
+            nans_left = df.isna().sum().sum()
+            st.session_state.nan_summary = ("\n- Filled all NaN values"
+                                            " with 0."
+                                            "\n- Leaving you with "
+                                            f"{nans_left}"
+                                            " NaN values.")
+            warning_placeholder.empty()
+            option_placeholder.empty()
+            confirmation_placeholder.empty()
+        else:
+            st.stop()
+
+# if we have handled the nan values, show a summary
+if st.session_state.nan_handling_confirmed:
+    retry = st.button("Redo with a different method of NaN Handling")
+    st.write(f"#### NaN Handling Summary: {st.session_state.nan_summary}")
+
+    # prompt the user to redo their handling if they want!
+    if retry:
+        st.session_state.nan_handling_confirmed = False
+        st.rerun()
 
 features = list(df.columns)
+
+st.write("Data types after conversion:")
+st.write(df.dtypes)
 
 input_feature_names = st.multiselect("Select input features", features)
 
