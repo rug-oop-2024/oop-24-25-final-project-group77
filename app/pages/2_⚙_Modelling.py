@@ -331,3 +331,7 @@ if st.button("Train Pipeline"):
     st.write("Evaluation Results:")
     for metric_result in results["metrics"]:
         st.write(metric_result)
+
+    predictions = results["predictions"]
+    prediction_results = pd.DataFrame(predictions)
+    st.write(predictions)
