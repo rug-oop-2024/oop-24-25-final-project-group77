@@ -21,11 +21,11 @@ class Lasso(Model):
         :param alpha: Regularization strength
         """
         super().__init__(type="regression")
-        alpha = self._validate_alpha(alpha)
+        alpha = self._validate_hyperparameters(alpha)
         self._model = WrappedLasso(alpha=alpha)
         self._hyperparameters = {"alpha": alpha}
 
-    def _validate_alpha(self, alpha: float) -> float:
+    def _validate_hyperparameters(self, alpha: float) -> float:
         """
         Validate the regularization strength
         """
@@ -33,14 +33,6 @@ class Lasso(Model):
             print("Regularization strength must be positive.",
                   "Setting to default value 1.0")
         return max(0, alpha)
-
-    @property
-    def validate_alpha(self) -> int:
-        """
-        Getter for the validator so that the user can check the allowed range.
-        Returns a deepcopy as functions are mutable.
-        """
-        return deepcopy(self._validate_alpha)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

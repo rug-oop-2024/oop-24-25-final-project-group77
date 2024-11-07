@@ -16,7 +16,7 @@ from model import Model  # noqa : E402
 class MultipleLogisticRegressor(Model):
     """Logistic Regression model wrapper."""
     def __init__(self, C: float = 1.0,
-                 penalty: Literal['l1', 'l2', 'elasticnet', 'none'] = 'l2'
+                 penalty: Literal["l2", "None"] = 'l2'
                  ) -> None:
         """
         Initialize the Logistic Regression model with various hyperparameters,
@@ -25,15 +25,15 @@ class MultipleLogisticRegressor(Model):
         :param C: Inverse of regularization strength
         """
         super().__init__(type="classification")
-        C, penalty = self._validate_parameters(C, penalty)
+        C, penalty = self._validate_hyperparameters(C, penalty)
         self._model = LogisticRegression(penalty=penalty, C=C)
         self._hyperparameters = {"C": C, "penalty": penalty}
 
-    def _validate_parameters(
+    def _validate_hyperparameters(
         self,
         C: float,
-        penalty: Literal['l1', 'l2', 'elasticnet', 'none']
-    ) -> Tuple[float, Literal['l1', 'l2', 'elasticnet', 'none']]:
+        penalty: Literal["l2", "None"]
+    ) -> Tuple[float, Literal["l2", "None"]]:
         """
         Validates the parameters for the model.
         Replaces every wrong parameter with its default
@@ -48,20 +48,12 @@ class MultipleLogisticRegressor(Model):
                   "Setting to default value 1.0")
             C = 1.0
 
-        if penalty not in ['l1', 'l2', 'elasticnet', 'none']:
-            print("Penalty must be 'l1', 'l2', 'elasticnet', or 'none'. "
+        if penalty not in ['l2', 'None']:
+            print("Penalty must be 'l2' or 'None'. "
                   "Setting to default value 'l2'")
             penalty = 'l2'
 
         return C, penalty
-
-    @property
-    def validate_parameters(self) -> int:
-        """
-        Getter for the validator so that the user can check the allowed range.
-        Returns a deepcopy as functions are mutable.
-        """
-        return deepcopy(self._validate_parameters)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

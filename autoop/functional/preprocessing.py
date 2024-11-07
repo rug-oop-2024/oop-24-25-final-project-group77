@@ -24,14 +24,16 @@ def preprocess_features(features: List[Feature], dataset: Dataset
         if feature.type == "categorical":
             encoder = LabelEncoder()
             data = encoder.fit_transform(raw[feature.name].values)
-            artifact = {"type": "LabelEncoder", "encoder": encoder.get_params()}
+            artifact = {"type": "LabelEncoder",
+                        "encoder": encoder.get_params()}
             results.append((feature.name, data, artifact))
 
         if feature.type == "numerical":
-
             scaler = StandardScaler()
-            data = scaler.fit_transform(raw[feature.name].values.reshape(-1, 1))
-            artifact = {"type": "StandardScaler", "scaler": scaler.get_params()}
+            data = scaler.fit_transform(
+                raw[feature.name].values.reshape(-1, 1))
+            artifact = {"type": "StandardScaler",
+                        "scaler": scaler.get_params()}
             results.append((feature.name, data, artifact))
 
     # Sort for consistency

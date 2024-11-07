@@ -27,13 +27,13 @@ class SVMClassifier(Model):
         :param gamma: Kernel coefficient
         """
         super().__init__(type="classification")
-        C, kernel, degree, gamma = self._validate_parameters(C, kernel, degree,
-                                                             gamma)
+        C, kernel, degree, gamma = self._validate_hyperparameters(
+            C, kernel, degree, gamma)
         self._model = SVC(C=C, kernel=kernel, degree=degree, gamma=gamma)
         self._hyperparameters = {"C": C, "kernel": kernel, "degree": degree,
                                  "gamma": gamma}
 
-    def _validate_parameters(
+    def _validate_hyperparameters(
         self,
         C: float,
         kernel: Literal['linear', 'poly', 'rbf', 'sigmoid'],
@@ -73,14 +73,6 @@ class SVMClassifier(Model):
             gamma = 'scale'
 
         return C, kernel, degree, gamma
-
-    @property
-    def validate_parameters(self) -> int:
-        """
-        Getter for the validator so that the user can check the allowed range.
-        Returns a deepcopy as functions are mutable.
-        """
-        return deepcopy(self._validate_parameters)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

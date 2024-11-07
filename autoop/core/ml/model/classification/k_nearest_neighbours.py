@@ -1,6 +1,5 @@
 import numpy as np
 from collections import Counter
-from copy import deepcopy
 import os
 import sys
 
@@ -19,9 +18,9 @@ class KNearestNeighbors(Model):
         including the number of nearest neighbours.
         """
         super().__init__(type="classification")
-        self.k = self._validate_k(k)
+        self.k = self._validate_hyperparameters(k)
 
-    def _validate_k(self, v: int) -> int:
+    def _validate_hyperparameters(self, v: int) -> int:
         """ Validate k to ensure that it is an int larger than 0. """
         if not isinstance(v, int):
             print('K must be an integer. Setting to default value 3')
@@ -33,7 +32,11 @@ class KNearestNeighbors(Model):
 
     @property
     def k(self) -> int:
-        """ Getter for the number of nearest neighbours. """
+        """
+        Getter for the number of nearest neighbours.
+        The getter is used as this model allows dynamic modification
+        of its hyperparameters, as they are not used in training.
+        """
         return self._k
 
     @k.setter
@@ -43,16 +46,8 @@ class KNearestNeighbors(Model):
         This is the only model that allows a hyperparameter to be set by
         the user, as this paramater is not used in training.
         """
-        self._k = self._validate_k(v)
+        self._k = self._validate_hyperparameters(v)
         self._hyperparameters = {"k": v}
-
-    @property
-    def validate_k(self) -> int:
-        """
-        Getter for the validator so that the user can check the allowed range.
-        Returns a deepcopy as functions are mutable.
-        """
-        return deepcopy(self._validate_k)
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """

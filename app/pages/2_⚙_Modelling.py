@@ -1,16 +1,13 @@
 import streamlit as st
 import pandas as pd
 import io
+import re
 
-from autoop.core.ml.model.classification import MultipleLogisticRegressor
-from autoop.core.ml.model.classification import SVMClassifier
-from autoop.core.ml.model.classification import KNearestNeighbors
-from autoop.core.ml.model.regression import MultipleLinearRegression, Lasso
-from autoop.core.ml.model.regression import XGBRegressor
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.metric import get_metric
 from autoop.core.ml.pipeline import Pipeline
 from app.core.system import AutoMLSystem
+from app.core.utils import get_model_parameter_mapping
 
 
 st.set_page_config(page_title="Modelling", page_icon="📈")
@@ -82,7 +79,7 @@ if "nan_summary" not in st.session_state:
     st.session_state.nan_summary = ""
 
 if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
-    # conve
+    # make it nice!!!
     for col in df.columns:
         df[col] = df[col].apply(try_convert)
 
@@ -149,6 +146,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
             confirmation_placeholder.success("Interpolating NaN values.")
             numeric_cols = df.select_dtypes(include=['number']).columns
             df[numeric_cols] = df[numeric_cols].interpolate(method="linear")
+            df = df.dropna().reset_index(drop=True)  # remove any leftovers NAs
             st.session_state["modified_df"] = df  # store the modified df
             st.session_state.nan_handling_confirmed = True
             nans_left = df.isna().sum().sum()
@@ -226,39 +224,22 @@ else:
 st.subheader("3. Choose Model Type")
 
 # mapping of models with corresponding hyperparameters to be chosen
-model_mapping = {
-    "Multiple Linear Regression": (MultipleLinearRegression, {}),
-    "Multiple Logistic Regression": (MultipleLogisticRegressor, {
-        "C": (st.slider, "C", 0.01, 10.0, 1.0, 0.1),
-        "penalty": (st.selectbox, "Penalty", ["l1", "l2",
-                                              "elasticnet", "none"]),
-    }),
-    "K Nearest Neighbours": (KNearestNeighbors, {
-        "k": (st.slider, "K", 1, 10, 3),
-    }),
-    "Support Vector Machine": (SVMClassifier, {
-        "C": (st.slider, "C", 0.01, 10.0, 1.0, 0.1),
-        "kernel": (st.selectbox, "Kernel", ["linear",
-                                            "poly", "rbf", "sigmoid"]),
-        "degree": (st.slider, "Degree", 1, 5, 3, 1)
-    }),
-    "Lasso": (Lasso, {
-        "alpha": (st.slider, "Alpha", 0.0, 10.0, 1.0, 0.5),
-    }),
-    "XGBoost Regressor": (XGBRegressor, {
-        "max_depth": (st.slider, "Max Depth", 1, 15, 6),
-        "learning_rate": (st.slider, "Learning Rate", 0.00, 1.00, 0.1, 0.01),
-        "n_estimators": (st.slider, "Number of Estimators", 0, 500, 100),
-        "gamma": (st.slider, "Gamma", 0.0, 5.0, 0.0, 0.1),
-    }),
-}
+model_mapping = get_model_parameter_mapping()
 
 if task_type == "Classification":
     model_choices = ["K Nearest Neighbours", "Support Vector Machine",
                      "Multiple Logistic Regression"]
+    if df.isna().sum().sum() > 0:
+        model_choices = ["Support Vector Machine"]
+        st.warning(
+            "As there are still NA values, model selection is restricted")
 else:
     model_choices = ["Multiple Linear Regression", "Lasso",
                      "XGBoost Regressor"]
+    if df.isna().sum().sum() > 0:
+        model_choices = ["XGBoost Regressor"]
+        st.warning(
+            "As there are still NA values, model selection is restricted")
 
 # prompt user to select a model
 model_choice = st.selectbox("Select a model", model_choices)
@@ -329,8 +310,14 @@ if st.button("Train Pipeline"):
 
     st.success("Training complete!")
     st.write("Evaluation Results:")
+    # "<autoop.core.ml.metric.RootMeanSquaredError object at 0x000002D36E24D150>"
+    metric_pattern = re.compile(r"^.*metric\.([A-Za-z]+).*$")
+
     for metric_result in results["metrics"]:
-        st.write(metric_result)
+        metric_name = re.findall(metric_pattern, metric_result[1])  # change to actually find the pattern name
+        st.write(f"Metric: {metric_name}")
+        st.write(f"{metric_result[0]} {metric_result[2]:.5f}")
+        st.write(f"{metric_result[3]} {metric_result[5]:.5f}")
 
     predictions = results["predictions"]
     prediction_results = pd.DataFrame(predictions)

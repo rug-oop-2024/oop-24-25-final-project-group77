@@ -16,18 +16,38 @@ class Model(ABC):
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """
         Train the model based on the observations and labels (ground_truth).
+        :param observations: data to fit on
+        :param
         """
         pass
 
     @abstractmethod
     def predict(self, observations: np.ndarray) -> np.ndarray:
-        """Make predictions based on the observations."""
+        """ Make predictions based on the observations. """
         pass
+
+    @abstractmethod
+    def _validate_hyperparameters(self) -> None:
+        """ Validate parameter values passed by the user """
+        pass
+
+    @property
+    def validate_hyperparameters(self) -> int:
+        """
+        Getter for the validator so that the user can check the allowed range.
+        Returns a deepcopy as functions are mutable.
+        """
+        return deepcopy(self._validate_hyperparameters)
 
     @property
     def parameters(self) -> dict:
         """ Returns a copy of parameters to prevent leakage. """
         return deepcopy(self._parameters)
+
+    @property
+    def hyperparameters(self) -> dict:
+        """ Returns a copy of hyperparameters to prevent leakage"""
+        return deepcopy(self._hyperparameters)
 
     @property
     def type(self) -> str:

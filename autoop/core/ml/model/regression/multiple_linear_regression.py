@@ -18,6 +18,13 @@ class MultipleLinearRegression(Model):
         """ Initialize the model. """
         super().__init__(type="regression")
 
+    def _validate_hyperparameters(self) -> None:
+        """
+        Lets the user know that they should
+        not set the hyperparameter values for this model
+        """
+        print("This model does not have hyperparameters")
+
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """
         Train the model based on the formula provided in the assignment.
