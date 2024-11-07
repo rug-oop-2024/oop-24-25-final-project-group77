@@ -61,7 +61,7 @@ class KNearestNeighbors(Model):
         """
         self._parameters = {
             "observations": observations,
-            "ground_truth": ground_truth.ravel()
+            "ground_truth": ground_truth
         }
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
@@ -85,7 +85,7 @@ class KNearestNeighbors(Model):
         # step2: sort the array of the distances and take the first k
         k_indices = np.argsort(dist)[:self.k]
         # step3: check the label aka ground truth of those points
-        k_nearest_labels = [self._parameters["ground_truth"][i].item() for i in
+        k_nearest_labels = [tuple(self._parameters["ground_truth"][i]) for i in
                             k_indices]
         # step4: take most common label and return it to the caller
-        return int(Counter(k_nearest_labels).most_common()[0][0])
+        return Counter(k_nearest_labels).most_common()[0][0]
