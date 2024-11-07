@@ -2,7 +2,7 @@ from typing import List, Tuple
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.dataset import Dataset
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import pandas as pd
 import io
 
@@ -22,15 +22,9 @@ def preprocess_features(features: List[Feature], dataset: Dataset
 
     for feature in features:
         if feature.type == "categorical":
-            # to convert categorical feature to integer indices
-            label_encoder = LabelEncoder()
-            raw[feature.name + '_encoded'] = label_encoder.fit_transform(
-                raw[feature.name])
-
-            encoder = OneHotEncoder()
-            data = encoder.fit_transform(raw[feature.name].values.reshape(-1, 1)).toarray()
+            encoder = OneHotEncoder(sparse_output=False)  
+            data = encoder.fit_transform(raw[feature.name].values.reshape(-1, 1))
             artifact = {"type": "OneHotEncoder", "encoder": encoder.get_params()}
-
             results.append((feature.name, data, artifact))
 
         if feature.type == "numerical":
@@ -39,7 +33,7 @@ def preprocess_features(features: List[Feature], dataset: Dataset
             data = scaler.fit_transform(raw[feature.name].values.reshape(-1, 1))
             artifact = {"type": "StandardScaler", "scaler": scaler.get_params()}
             results.append((feature.name, data, artifact))
- 
+
     # Sort for consistency
     results = list(sorted(results, key=lambda x: x[0]))
     return results

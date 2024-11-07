@@ -19,10 +19,10 @@ class Artifact(BaseModel):
         """
         Get the id of the artifact
         :returns: str: The id of the artifact
+        we use '-' instead of ':' to avoid issues with windows
         """
-        # REMOVING THE DOUBLE ==, ANOTHER WINDOWS ISSUE
         base64_asset_path = base64.b64encode(self.asset_path.encode()).decode()
-        # remove the last two characters
+        # REMOVING THE DOUBLE ==, ANOTHER WINDOWS ISSUE
         base64_asset_path = base64_asset_path[:-2]
         return f"{base64_asset_path}-{self.version}"
 

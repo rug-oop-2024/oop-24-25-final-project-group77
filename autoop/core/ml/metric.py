@@ -26,11 +26,13 @@ class Metric(ABC):
         Calls ValueErrors if y_true and y_pred are not numpy arrays
         of the same size.
         """
-        if not isinstance(y_true, np.ndarray) or not isinstance(
-                y_pred, np.ndarray):
-            raise ValueError("both y_true and y_pred must be numpy arrays")
+        if not isinstance(y_true, np.ndarray):
+            raise ValueError("y_true must be a numpy array")
+        if not isinstance(y_pred, np.ndarray):
+            raise ValueError("y_pred must be a numpy array")
+        y_true, y_pred = y_true.squeeze(), y_pred.squeeze()
         if y_true.shape != y_pred.shape:
-            print(y_true.shape, y_pred.shape)
+            print(y_true.shape, y_pred.shape, y_true, y_pred)
             raise ValueError("y_true and y_pred must have the same size")
         return self._calculate(y_true, y_pred)
 
