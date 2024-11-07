@@ -2,7 +2,7 @@ from typing import List, Tuple
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.dataset import Dataset
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 import pandas as pd
 import io
 
@@ -22,9 +22,9 @@ def preprocess_features(features: List[Feature], dataset: Dataset
 
     for feature in features:
         if feature.type == "categorical":
-            encoder = OneHotEncoder(sparse_output=False)  
-            data = encoder.fit_transform(raw[feature.name].values.reshape(-1, 1))
-            artifact = {"type": "OneHotEncoder", "encoder": encoder.get_params()}
+            encoder = LabelEncoder()
+            data = encoder.fit_transform(raw[feature.name].values)
+            artifact = {"type": "LabelEncoder", "encoder": encoder.get_params()}
             results.append((feature.name, data, artifact))
 
         if feature.type == "numerical":
