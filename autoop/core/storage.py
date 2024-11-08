@@ -58,13 +58,22 @@ class Storage(ABC):
 class LocalStorage(Storage):
     """ Local storage class """
     def __init__(self, base_path: str = "./assets") -> None:
-        """ Initialize the local storage """
+        """
+        Initialize the local storage
+        Args:
+            base_path (str): Base path to store data
+        """
         self._base_path = os.path.normpath(base_path)
         if not os.path.exists(self._base_path):
             os.makedirs(self._base_path)
 
     def save(self, data: bytes, key: str) -> None:
-        """ Save data to a given path """
+        """
+        Save data to a given path
+        Args:
+            data (bytes): Data to save
+            key (str): Path to save data
+        """
         path = self._join_path(key)
         # Ensure parent directories are created
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -73,20 +82,36 @@ class LocalStorage(Storage):
             f.write(data)
 
     def load(self, key: str) -> bytes:
-        """ Load data from a given path """
+        """
+        Load data from a given path
+        Args:
+            key (str): Path to load data
+        Returns:
+            bytes: Loaded data
+        """
         path = self._join_path(key)
         self._assert_path_exists(path)
         with open(path, 'rb') as f:
             return f.read()
 
     def delete(self, key: str = "/") -> None:
-        """ Delete data at a given path """
+        """
+        Delete data at a given path
+        Args:
+            key (str): Path to delete data
+        """
         path = self._join_path(key)
         self._assert_path_exists(path)
         os.remove(path)
 
     def list(self, prefix: str = "/") -> List[str]:
-        """ List all paths under a given path """
+        """
+        List all paths under a given path
+        Args:
+            prefix (str): Path to list
+        Returns:
+            list: List of paths
+        """
         path = self._join_path(prefix)
         self._assert_path_exists(path)
         # Use os.path.join for compatibility across platforms
@@ -95,10 +120,22 @@ class LocalStorage(Storage):
                 p in keys if os.path.isfile(p)]
 
     def _assert_path_exists(self, path: str) -> None:
-        """ Raise an exception if the path does not exist. """
+        """
+        Raise an exception if the path does not exist.
+        Args:
+            path (str): Path to check
+        Raises:
+            NotFoundError: If the path does not exist
+        """
         if not os.path.exists(path):
             raise NotFoundError(path)
 
     def _join_path(self, path: str) -> str:
-        """  Ensure paths are OS-agnostic"""
+        """
+        Ensure paths are OS-agnostic
+        Args:
+            path (str): Path to join
+        Returns:
+            str: Joined path
+        """
         return os.path.normpath(os.path.join(self._base_path, path))

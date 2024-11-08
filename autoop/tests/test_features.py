@@ -13,12 +13,17 @@ from autoop.core.ml.dataset import Dataset  # noqa : E402
 from autoop.core.ml.feature import Feature  # noqa : E402
 from autoop.functional.feature import detect_feature_types  # noqa : E402
 
-class TestFeatures(unittest.TestCase):
 
+class TestFeatures(unittest.TestCase):
+    """ Test the features detection. """
     def setUp(self) -> None:
         pass
 
-    def test_detect_features_continuous(self):
+    def test_detect_features_continuous(self) -> None:
+        """
+        Tests that the detect_feature_types function works correctly when the
+        dataset does not have any categorical features.
+        """
         iris = load_iris()
         df = pd.DataFrame(
             iris.data,
@@ -39,7 +44,11 @@ class TestFeatures(unittest.TestCase):
             self.assertEqual(feature.name in iris.feature_names, True)
             self.assertEqual(feature.type, "numerical")
 
-    def test_detect_features_with_categories(self):
+    def test_detect_features_with_categories(self) -> None:
+        """
+        Tests that the detect_feature_types function works correctly when the
+        dataset contains both categorical and numerical features.
+        """
         data = fetch_openml(name="adult", version=1, parser="auto")
         df = pd.DataFrame(
             data.data,

@@ -17,7 +17,12 @@ class Metric(ABC):
 
     @abstractmethod
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Calculates the metric """
+        """
+        Calculates the metric.
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: calculated metric
+        """
         pass
 
     def __call__(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -43,14 +48,19 @@ class Metric(ABC):
 
 
 class MeanSquaredError(Metric):
-    """ Implements the Mean Squared Error metric"""
+    """ Implements the Mean Squared Error metric """
     _name = "Mean Squared Error"
     _description = "Calculates the average of all" + \
         " the squared differences between the ground truth and the prediction"
     _task_type = "regression"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Calculates the mean squared error """
+        """
+        Calculates the mean squared error
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: mean squared error
+        """
         return np.mean((y_true - y_pred) ** 2)
 
 
@@ -62,7 +72,12 @@ class RootMeanSquaredError(Metric):
     _task_type = "regression"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Calculates the root mean squared error """
+        """
+        Calculates the root mean squared error
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: root mean squared error
+        """
         return np.sqrt(np.mean((y_true - y_pred) ** 2))
 
 
@@ -74,7 +89,12 @@ class R2(Metric):
     _task_type = "regression"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Calculates the R2 score """
+        """
+        Calculates the R2 score
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: R2 score
+        """
         sum_s_res = np.sum((y_true - y_pred) ** 2)
         sum_s_tot = np.sum((y_true - np.mean(y_true)) ** 2)
         return 1 - sum_s_res / sum_s_tot
@@ -87,7 +107,12 @@ class Accuracy(Metric):
     _task_type = "classification"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Calculates the mean accuracy """
+        """
+        Calculates the mean accuracy
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: accuracy score
+        """
         return np.mean(y_true == y_pred)
 
 
@@ -99,7 +124,12 @@ class Recall(Metric):
     _task_type = "classification"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Apply multiclass recall calculation """
+        """
+        Apply multiclass recall calculation
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: weighted recall score
+        """
         unique_classes = np.unique(y_true)
         recall_scores, class_instances = [], []
 
@@ -134,7 +164,12 @@ class Precision(Metric):
     _task_type = "classification"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Apply multiclass precision calculation """
+        """
+        Apply multiclass precision calculation
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: precision score
+        """
         all_classes = np.unique(y_true)
         precision_scores, class_instances = [], []
 
@@ -170,7 +205,12 @@ class F1(Metric):
     _task_type = "classification"
 
     def _calculate(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        """ Apply multiclass F1-score calculation """
+        """
+        Apply multiclass F1-score calculation
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: f1 score
+        """
         helper_class_recall = Recall()
         helper_class_precision = Precision()
         recall = helper_class_recall(y_true, y_pred)

@@ -65,6 +65,7 @@ class Pipeline:
         """
         Used to get the artifacts generated during the pipeline
         execution to be saved.
+        :return: List of artifacts generated during the pipeline execution
         """
         artifacts = []
         for name, artifact in self._artifacts.items():
@@ -91,7 +92,11 @@ class Pipeline:
         return artifacts
 
     def _register_artifact(self, name: str, artifact: Artifact) -> None:
-        """ Register an artifact in the pipeline. """
+        """
+        Register an artifact in the pipeline.
+        :param name: name of the artifact
+        :param artifact: artifact to be registered
+        """
         self._artifacts[name] = artifact
 
     def _preprocess_features(self) -> None:
@@ -124,7 +129,11 @@ class Pipeline:
             split * len(self._output_vector)):]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
-        """ Compact the vectors into a single array. """
+        """
+        Compact the vectors into a single array.
+        :param vectors: list of vectors
+        :return: compacted vector
+        """
         return np.concatenate(vectors, axis=1)
 
     def _train(self) -> None:

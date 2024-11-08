@@ -5,9 +5,12 @@ import numpy as np
 
 
 class Model(ABC):
-    """Base class for all models used in the assignment."""
+    """ Base class for all models used in the assignment. """
     def __init__(self, type: str = None) -> None:
-        """Initialize the Model class by creating the artifact"""
+        """
+        Initialize the Model class by creating the artifact.
+        :param type: type of the model
+        """
         self._parameters: dict = {}
         self._hyperparameters: dict = {}
         self._type = type
@@ -17,13 +20,17 @@ class Model(ABC):
         """
         Train the model based on the observations and labels (ground_truth).
         :param observations: data to fit on
-        :param
+        :param ground_truth: labels of the observations
         """
         pass
 
     @abstractmethod
     def predict(self, observations: np.ndarray) -> np.ndarray:
-        """ Make predictions based on the observations. """
+        """
+        Make predictions based on the observations.
+        :param observations: data to make predictions on
+        :returns: predictions made by the model
+        """
         pass
 
     @abstractmethod
@@ -46,7 +53,7 @@ class Model(ABC):
 
     @property
     def hyperparameters(self) -> dict:
-        """ Returns a copy of hyperparameters to prevent leakage"""
+        """ Returns a copy of hyperparameters to prevent leakage. """
         return deepcopy(self._hyperparameters)
 
     @property

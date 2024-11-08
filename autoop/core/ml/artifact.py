@@ -27,13 +27,12 @@ class Artifact(BaseModel):
         return f"{base64_asset_path}-{self.version}"
 
     def read(self) -> bytes:
-        """ Read data from a given path """
+        """ Returns data stored in the artifact"""
         return self.data
 
     def save(self, data: bytes) -> None:
         """
         Save the artifact's data to the specified asset path.
-        Raises an exception if the directory does not exist.
         """
         self.data = data
         os.makedirs(os.path.dirname(self.asset_path), exist_ok=True)

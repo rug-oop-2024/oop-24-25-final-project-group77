@@ -93,6 +93,8 @@ class XGBRegressor(Model):
         """
         Train the model based on the observations and labels (ground_truth)
         by applying the xgboost method .fit
+        :param observations: data to fit on
+        :param ground_truth: labels of the observations
         """
         self._model.fit(observations, ground_truth)
         self._parameters = {
@@ -103,6 +105,8 @@ class XGBRegressor(Model):
         """
         Make predictions based on the observations
         by applying the xgboost method .predict
+        :param observations: data to make predictions on
+        :returns: predictions made by the model
         """
         return self._model.predict(observations)
 

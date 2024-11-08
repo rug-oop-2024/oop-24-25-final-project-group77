@@ -9,13 +9,18 @@ from autoop.core.storage import Storage
 class Database():
     """ The database class """
     def __init__(self, storage: Storage) -> None:
-        """ Initialize the database """
+        """
+        Initialize the database
+        Args:
+            storage (Storage): The storage to use
+        """
         self._storage = storage
         self._data = {}
         self._load()
 
     def set(self, collection: str, id: str, entry: dict) -> dict:
-        """Set a key in the database
+        """
+        Set a key in the database
         Args:
             collection (str): The collection to store the data in
             id (str): The id of the data
@@ -34,7 +39,8 @@ class Database():
         return entry
 
     def get(self, collection: str, id: str) -> Union[dict, None]:
-        """Get a key from the database
+        """
+        Get a key from the database
         Args:
             collection (str): The collection to get the data from
             id (str): The id of the data
@@ -47,7 +53,8 @@ class Database():
         return self._data[collection].get(id, None)
 
     def delete(self, collection: str, id: str) -> None:
-        """Delete a key from the database
+        """
+        Delete a key from the database
         Args:
             collection (str): The collection to delete the data from
             id (str): The id of the data
@@ -64,7 +71,8 @@ class Database():
         self._persist(skip=True)  # works until here
 
     def list(self, collection: str) -> List[Tuple[str, dict]]:
-        """Lists all data in a collection
+        """
+        Lists all data in a collection
         Args:
             collection (str): The collection to list the data from
         Returns:
@@ -76,12 +84,15 @@ class Database():
         return [(id, data) for id, data in self._data[collection].items()]
 
     def refresh(self) -> None:
-        """Refresh the database by loading the data from storage"""
+        """ Refresh the database by loading the data from storage. """
         self._load()
 
     def _persist(self, skip: bool = False) -> None:
         """
         Persist the data to storage
+        Args:
+            skip (bool, optional): Whether to skip persisting the data
+            if the data is already in the storage. Defaults to False.
         Added the skip boolean to avoid removal errors.
         Again, a TA should note that this is a temporary fix, and
         we are the group to develop the solution to the Windows problem,

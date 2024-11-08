@@ -16,6 +16,7 @@ class KNearestNeighbors(Model):
         """
         Initialize the KNN model with various hyperparameters,
         including the number of nearest neighbours.
+        :param k: number of neighbours considered to classify the input
         """
         super().__init__(type="classification")
         self.k = self._validate_hyperparameters(k)
@@ -45,6 +46,8 @@ class KNearestNeighbors(Model):
         Setter for the number of nearest neighbours.
         This is the only model that allows a hyperparameter to be set by
         the user, as this paramater is not used in training.
+        :param v: number of neighbours considered to classify the input,
+        denoted as v and not k for clarity.
         """
         self._k = self._validate_hyperparameters(v)
         self._hyperparameters = {"k": v}
@@ -53,6 +56,8 @@ class KNearestNeighbors(Model):
         """
         Trains the KNN model by storing the input observations
         and ground truth labels into a dictionary of parameters.
+        :param observations: data to fit on
+        :param ground_truth: labels of the observations
         """
         self._parameters = {
             "observations": observations,
@@ -64,6 +69,8 @@ class KNearestNeighbors(Model):
         Generates predictions by iterating through each
         observation and predicting per observation as per
         the method _predict_single. Returns all the predictions.
+        :param observations: data to make predictions on
+        :returns: predictions made by the model
         """
         predictions = [self._predict_single(x) for x in observations]
         predictions = np.array(predictions, dtype=int)
@@ -73,6 +80,8 @@ class KNearestNeighbors(Model):
         """
         This method implements the KNN algorithm, as described
         in Tutorial 1.  We are not the authors of this algorithm.
+        :param observations: single data point to make a prediction on
+        :returns: predictions single prediction made by the model
         """
         # step1: calc distance between observation and every other point
         dist = np.linalg.norm(self._parameters["observations"] - observations,
