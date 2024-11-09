@@ -197,7 +197,7 @@ def choose_model(df, task_type) -> AutoMLSystem:
     if df.isna().sum().sum() > 0:
         st.warning("As there are still NA values, model "
                    "selection is restricted")
-        model_choices = ["Support Vector Machine",] \
+        model_choices = [" None - remove NA values",] \
             if st.session_state.task_type == "Classification" else \
                         ["XGBoost Regressor"]
     else:
