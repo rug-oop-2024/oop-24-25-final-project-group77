@@ -6,6 +6,9 @@ from typing import List
 
 
 class ArtifactRegistry():
+    """
+    The ArtifactRegistry class
+    """
     def __init__(self,
                  database: Database,
                  storage: Storage):

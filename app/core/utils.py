@@ -89,8 +89,9 @@ def select_dataset(automl) -> pd.DataFrame | None:
     if datasets:
         dataset_names = [dataset.name for dataset in datasets]
         selected_dataset_name = st.selectbox("Select a dataset", dataset_names)
-        selected_dataset = next(ds for ds in datasets if ds.name
-                                == selected_dataset_name)
+        selected_dataset = next(
+            ds for ds in datasets if ds.name == selected_dataset_name
+            )
         return selected_dataset
     else:
         st.warning("No datasets available. Please upload one.")
@@ -177,8 +178,9 @@ def select_features_and_target(df) -> tuple[list[Feature], Feature]:
                    "and one target feature.")
         st.stop()
 
-    return [Feature(name=feat, type='categorical' if df[feat].dtype ==
-                    'object' else 'numerical') for feat in input_features], \
+    return [Feature(name=feat, type='categorical' if df[
+        feat].dtype == 'object' else 'numerical'
+        ) for feat in input_features], \
         Feature(name=target_feature, type='categorical' if
                 df[target_feature].dtype == 'object' else 'numerical')
 
@@ -223,10 +225,10 @@ def choose_model(df, task_type) -> AutoMLSystem:
             if st.session_state.task_type == "Classification" else \
                         ["XGBoost Regressor"]
     else:
-        model_choices = ["K Nearest Neighbours", "Support Vector Machine",
-                         "Multiple Logistic Regression"
-                         ] if st.session_state.task_type == \
-                                "Classification" else \
+        model_choices = [
+            "K Nearest Neighbours", "Support Vector Machine",
+            "Multiple Logistic Regression"
+                    ] if st.session_state.task_type == "Classification" else \
                         ["Multiple Linear Regression", "Lasso",
                             "XGBoost Regressor"]
 
@@ -244,9 +246,8 @@ def choose_model(df, task_type) -> AutoMLSystem:
     selected_model_class, hyperparams = model_mapping[model_choice]
 
     chosen_params = {param_name: input_fn(label, *args) for param_name,
-                     (
-                         input_fn, label, *args
-                         ) in hyperparams.items()} if hyperparams else {}
+                     (input_fn, label, *args
+                      ) in hyperparams.items()} if hyperparams else {}
     return selected_model_class(**chosen_params)
 
 
