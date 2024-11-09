@@ -169,3 +169,26 @@ class Pipeline:
             "metrics": self._metrics_results,
             "predictions": self._predictions,
         }
+
+    @staticmethod
+    def from_pipeline(
+        pipeline: "Pipeline", name: str, version: str, asset_path: str, 
+        serialized_pipeline: bytes
+         ) -> Artifact:
+        """
+        Create an Artifact from a Pipeline instance.
+        :param pipeline: the pipeline instance to be serialized and saved
+        :param name: name of the pipeline artifact
+        :param version: version of the pipeline artifact
+        :param asset_path: path to save the pipeline artifact
+        :return: an Artifact instance representing the serialized pipeline
+        """
+
+        # Create and return an Artifact instance
+        return Artifact(
+            name=name,
+            version=version,
+            asset_path=asset_path,
+            data=serialized_pipeline,
+            type="pipeline",
+        )

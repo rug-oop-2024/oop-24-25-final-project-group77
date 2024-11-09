@@ -3,6 +3,8 @@ from autoop.core.ml.feature import Feature
 from autoop.core.ml.dataset import Dataset
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+import io
+import pandas as pd
 
 
 def preprocess_features(features: List[Feature], dataset: Dataset
@@ -16,7 +18,7 @@ def preprocess_features(features: List[Feature], dataset: Dataset
         Each ndarray of shape (N, ...)
     """
     results = []
-    raw = dataset.read()   # applied fix to pass tests, might be unnecessary
+    raw = pd.read_csv(io.BytesIO(dataset.read()))
 
     for feature in features:
         if feature.type == "categorical":

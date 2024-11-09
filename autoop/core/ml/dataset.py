@@ -33,7 +33,7 @@ class Dataset(Artifact):
 
     @staticmethod
     def from_dataframe(
-        data: pd.DataFrame, name: str, asset_path: str, version: str = "latest"
+        data: pd.DataFrame, name: str, asset_path: str, version: str = "1.0.0"
     ) -> "Dataset":
         """
         Create a dataset from a pandas dataframe.
