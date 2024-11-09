@@ -41,6 +41,9 @@ if "modified_df" not in st.session_state:
     data_io = io.BytesIO(data)
     original_df = pd.read_csv(data_io).replace(
         r'^\s*$', float('NaN'), regex=True)
+    original_df = original_df.applymap(lambda x: x.strip()
+                                       if isinstance(x, str) else x).replace(
+                                           '', float('NaN'))
     st.session_state["original_df"] = original_df
 
 # Retrieve the original or modified DataFrame from session state
@@ -56,6 +59,15 @@ if "nan_handling_confirmed" not in st.session_state:
 
 if "nan_summary" not in st.session_state:
     st.session_state.nan_summary = ""
+
+if "training_done" not in st.session_state:
+    st.session_state.training_done = False
+
+if "model_choices" not in st.session_state:
+    st.session_state.model_choices = False
+
+if "task_type" not in st.session_state:
+    st.session_state.task_type = False
 
 # Check for NaN values and handle them if any are found
 if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
@@ -78,12 +90,14 @@ else:
             st.write(f"**- {key}:** {value}")
 
     input_features, target_feature = select_features_and_target(df)
-    task_type = "Classification" if target_feature.type == \
-        "categorical" else "Regression"
+    if st.button("Detect Target Type") or not st.session_state.task_type:
+        st.session_state.task_type = "Classification" if \
+            target_feature.type == "categorical" else "Regression"
+    st.info("detected task: " + st.session_state.task_type)
 
-    model = choose_model(df, task_type)
+    model = choose_model(df, st.session_state.task_type)
     split = set_train_test_split()
-    metrics = select_metrics(task_type)
+    metrics = select_metrics(st.session_state.task_type)
 
     pipeline = Pipeline(dataset=selected_dataset, model=model,
                         input_features=input_features,
@@ -91,5 +105,8 @@ else:
                         metrics=metrics, split=split)
 
     display_pipeline_summary(pipeline)
-    train_pipeline(pipeline)
-    save_pipeline(automl, pipeline)
+
+    if st.button("Train Pipeline") or st.session_state.training_done:
+        train_pipeline(pipeline)
+        st.session_state.training_done = True
+        save_pipeline(automl, pipeline)

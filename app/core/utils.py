@@ -18,7 +18,9 @@ from autoop.core.ml.metric import get_metric
 from app.core.system import AutoMLSystem
 
 
-def get_model_parameter_mapping():
+def get_model_parameter_mapping() -> dict:
+    """ Returns a dictionary mapping model names to model classes and
+    hyperparameters. """
     model_mapping = {
         "Multiple Linear Regression": (MultipleLinearRegression, {}),
         "Multiple Logistic Regression": (MultipleLogisticRegressor, {
@@ -49,7 +51,8 @@ def get_model_parameter_mapping():
     return model_mapping
 
 
-def reset_pipeline():
+def reset_pipeline() -> None:
+    """ Clears the session state to reset the pipeline. """
     if "original_df" in st.session_state:
         del st.session_state["original_df"]
     if "modified_df" in st.session_state:
@@ -58,10 +61,21 @@ def reset_pipeline():
         del st.session_state["nan_handling_confirmed"]
     if "nan_summary" in st.session_state:
         del st.session_state["nan_summary"]
+    if "training_done" in st.session_state:
+        del st.session_state["training_done"]
+    if "pipeline" in st.session_state:
+        del st.session_state["pipeline"]
+    if "model_choices" in st.session_state:
+        del st.session_state["model_choices"]
+    if "task_type" in st.session_state:
+        del st.session_state["task_type"]
+    for remaining_key in st.session_state.keys():  # just to make sure
+        del st.session_state[remaining_key]
     st.rerun()
 
 
-def select_dataset(automl):
+def select_dataset(automl) -> pd.DataFrame | None:
+    """ Selects a dataset from the AutoML system and returns it. """
     st.subheader("1. Select a Dataset")
     datasets = automl.registry.list(type="dataset")
     if datasets:
@@ -78,12 +92,12 @@ def select_dataset(automl):
 def try_convert(value: str) -> float | str:
     """ Converts values to numeric if possible, otherwise returns as is """
     try:
-        return pd.to_numeric(value)
+        return pd.to_numeric(value, errors='raise')
     except ValueError:
         return value
 
 
-def handle_nan_values(df):
+def handle_nan_values(df) -> tuple[pd.DataFrame, dict]:
     """Handle NaN values based on user input."""
     initial_nan_count = df.isna().sum().sum()  # Initial count of NaN values
     st.write(f"There are {initial_nan_count} NaN values in the dataset.")
@@ -128,7 +142,11 @@ def handle_nan_values(df):
     return df, {}
 
 
-def select_features_and_target(df):
+def select_features_and_target(df) -> tuple[list[Feature], Feature]:
+    """
+    Selects features and target from the dataset.
+    :param df: The dataset
+    """
     st.subheader("2. Select Features and Target")
     features = list(df.columns)
     input_features = st.multiselect("Select input features", features)
@@ -147,22 +165,60 @@ def select_features_and_target(df):
                 df[target_feature].dtype == 'object' else 'numerical')
 
 
-def choose_model(df, task_type):
+def revert_task_type(task_type) -> None:
+    """ Reverts the model task type """
+    st.session_state.training_done = False
+    if task_type == "Classification":
+        st.session_state.task_type = "Regression"
+        if len(st.session_state.model_choices) == 1:
+            st.session_state.model_choices = ["XGBoost Regressor"]
+        else:
+            st.session_state.model_choices = ["Multiple Linear Regression",
+                                              "Lasso",
+                                              "XGBoost Regressor"]
+    else:
+        st.session_state.task_type = "Classification"
+        if len(st.session_state.model_choices) == 1:
+            st.session_state.model_choices = ["K Nearest Neighbours"]
+        else:
+            st.session_state.model_choices = ["K Nearest Neighbours",
+                                              "Support Vector Machine",
+                                              "Multiple Logistic Regression"]
+
+
+def choose_model(df, task_type) -> AutoMLSystem:
+    """
+    Selects a model based on user input.
+    :param df: The dataset
+    :param task_type: The task type
+    """
     st.subheader("3. Choose Model Type")
     model_mapping = get_model_parameter_mapping()
     if df.isna().sum().sum() > 0:
         st.warning("As there are still NA values, model "
                    "selection is restricted")
         model_choices = ["Support Vector Machine",] \
-            if task_type == "Classification" else \
+            if st.session_state.task_type == "Classification" else \
                         ["XGBoost Regressor"]
     else:
         model_choices = ["K Nearest Neighbours", "Support Vector Machine",
                          "Multiple Logistic Regression"
-                         ] if task_type == "Classification" else \
+                         ] if st.session_state.task_type == \
+                                "Classification" else \
                         ["Multiple Linear Regression", "Lasso",
-                         "XGBoost Regressor"]
-    model_choice = st.selectbox("Select a model", model_choices)
+                            "XGBoost Regressor"]
+
+    st.session_state.model_choices = model_choices
+    st.write("Choose the model from the dropdown below.")
+    st.info("If you believe the automatically detected task is wrong, \
+             click the button bellow.")
+    if st.button("Switch model tasks"):
+        st.warning("Misspecified model task may cause the pipeline to fail."
+                   "Please choose the correct task type.")
+        revert_task_type(task_type)
+
+    model_choice = st.selectbox("Select a model",
+                                st.session_state.model_choices)
     selected_model_class, hyperparams = model_mapping[model_choice]
 
     chosen_params = {param_name: input_fn(label, *args) for param_name,
@@ -172,13 +228,18 @@ def choose_model(df, task_type):
     return selected_model_class(**chosen_params)
 
 
-def set_train_test_split():
+def set_train_test_split() -> float:
+    """ Sets the train-test split based on user input. """
     st.subheader("4. Set Train-Test Split")
     return st.slider("Training set percentage", min_value=0.1, max_value=0.9,
                      value=0.8)
 
 
-def select_metrics(task_type):
+def select_metrics(task_type) -> list:
+    """
+    Selects evaluation metrics based on user input.
+    :param task_type: The task type
+    """
     st.subheader("5. Choose Evaluation Metrics")
     metrics = ["Accuracy", "Recall", "Precision", "F1"
                ] if task_type == "Classification" else [
@@ -192,13 +253,14 @@ def select_metrics(task_type):
     return [get_metric(name) for name in selected_metrics]
 
 
-def display_pipeline_summary(pipeline):
+def display_pipeline_summary(pipeline) -> None:
+    """ Displays the pipeline summary. """
     st.subheader("Pipeline Summary")
     st.write(str(pipeline))
 
 
-def train_pipeline(pipeline):
-    # ! removed buttom since it caused too many issues with rerunning !
+def train_pipeline(pipeline) -> None:
+    """ Trains the pipeline. """
     results = pipeline.execute()
     if results:
         st.subheader("Evaluation Results")
@@ -209,22 +271,22 @@ def train_pipeline(pipeline):
             st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
             st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
             st.write("\n")
-        st.write(pd.DataFrame(results["predictions"]))
 
 
-def serialize_pipeline_data(pipeline):
+def serialize_pipeline_data(pipeline) -> bytes:
     """Serialize pipeline artifacts, model, and metrics."""
 
     artifacts_data = {
         'model': pipeline.model,
         'artifacts': pipeline.artifacts,
-        'metrics': pipeline.metrics
+        'metrics': pipeline._metrics_results
     }
 
     return pickle.dumps(artifacts_data)
 
 
 def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
+    """ Save the pipeline as an artifact. """
     with st.form("save_pipeline"):
         pl_name = st.text_input("Enter a name for the pipeline:")
         pl_version = st.text_input("Enter a version for the pipeline:")
@@ -240,5 +302,6 @@ def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
                 )
 
                 automl.registry.register(artifact_pipeline)
+                st.success(f"Pipeline '{pl_name}' saved successfully!")
             else:
                 st.warning("Please enter a name and version for the pipeline.")

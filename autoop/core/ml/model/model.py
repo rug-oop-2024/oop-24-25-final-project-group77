@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 from copy import deepcopy
-# from autoop.core.ml.artifact import Artifact
+from autoop.core.ml.artifact import Artifact
 import numpy as np
 
 
@@ -37,6 +37,12 @@ class Model(ABC):
     def _validate_hyperparameters(self) -> None:
         """ Validate parameter values passed by the user """
         pass
+
+    def to_artifact(self, name: str) -> Artifact:
+        """ Convert the model to an artifact. """
+        return Artifact(name=name, type="model",
+                        metadata={"parameters": self.parameters,
+                                  "hyperparameters": self.hyperparameters})
 
     @property
     def validate_hyperparameters(self) -> int:

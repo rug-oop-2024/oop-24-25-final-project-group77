@@ -9,7 +9,7 @@ class Dataset(Artifact):
     @property
     def name(self) -> str:
         """ Returns the name of the dataset """
-        return self.name
+        return self._name
 
     def __init__(
         self,

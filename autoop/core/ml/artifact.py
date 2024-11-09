@@ -1,18 +1,35 @@
-from pydantic import BaseModel, Field
 import pickle
 import base64
 import os
 
 
-class Artifact(BaseModel):
+class Artifact():
     """ A class to represent an ML artifact"""
-    name: str = Field(title="Name of the asset")
-    asset_path: str = Field(title="Path to the asset")
-    version: str = Field(title="Version of the asset")
-    data: bytes = Field(title="Data of the asset")
-    metadata: dict = Field(title="Metadata of the asset", default_factory=dict)
-    type: str = Field(title="Type of the asset")
-    tags: list = Field(title="Tags of the asset", default_factory=list)
+    def __init__(self, name: str, asset_path: str = "", version: str = "",
+                 data: bytes = b"", metadata: dict = {}, type: str = "",
+                 tags: list = []):
+        """
+        Initialize the artifact
+        Args:
+            name (str): The name of the artifact
+            asset_path (str): The path to the artifact
+            version (str): The version of the artifact
+            data (bytes): The data of the artifact
+            metadata (dict): The metadata of the artifact
+            type (str): The type of the artifact
+        """
+        self._name = name
+        self.asset_path = asset_path
+        self.version = version
+        self.data = data
+        self.metadata = metadata
+        self.type = type
+        self.tags = tags
+
+    @property
+    def name(self) -> str:
+        """ Get the name of the artifact """
+        return self._name
 
     @property
     def id(self) -> str:
