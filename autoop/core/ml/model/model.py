@@ -39,7 +39,11 @@ class Model(ABC):
         pass
 
     def to_artifact(self, name: str) -> Artifact:
-        """ Convert the model to an artifact. """
+        """
+        Convert the model to an artifact.
+        :param name: name of the artifact
+        :returns: Artifact
+        """
         return Artifact(name=name, type="model",
                         metadata={"parameters": self.parameters,
                                   "hyperparameters": self.hyperparameters})
@@ -49,6 +53,7 @@ class Model(ABC):
         """
         Getter for the validator so that the user can check the allowed range.
         Returns a deepcopy as functions are mutable.
+        :returns: validator
         """
         return deepcopy(self._validate_hyperparameters)
 

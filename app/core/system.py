@@ -9,6 +9,11 @@ class ArtifactRegistry():
     def __init__(self,
                  database: Database,
                  storage: Storage):
+        """
+        Initialize the registry
+        :param database: The database to use
+        :param storage: The storage to use
+        """
         self._database = database
         self._storage = storage
 
@@ -42,6 +47,10 @@ class ArtifactRegistry():
         self._database.set("artifacts", id_temp, entry)
 
     def list(self, type: str = None) -> List[Artifact]:
+        """
+        Lists all the artifacts
+        :param type: The type of the artifacts
+        """
         entries = self._database.list("artifacts")
         artifacts = []
         for id, data in entries:
@@ -60,6 +69,10 @@ class ArtifactRegistry():
         return artifacts
 
     def get(self, artifact_id: str) -> Artifact:
+        """
+        Get the artifact from the database
+        :param artifact_id: The id of the artifact to get
+        """
         data = self._database.get("artifacts", artifact_id)
         return Artifact(
             name=data["name"],
@@ -72,21 +85,32 @@ class ArtifactRegistry():
         )
 
     def delete(self, artifact_id: str):
+        """
+        Delete the artifact from the database
+        :param artifact_id: The id of the artifact to get
+        """
         data = self._database.get("artifacts", artifact_id)
         self._storage.delete(data["asset_path"])   # works properly
         self._database.delete("artifacts", artifact_id)   # does not work
 
 
 class AutoMLSystem:
+    """The AutoMLSystem class"""
     _instance = None
 
     def __init__(self, storage: LocalStorage, database: Database):
+        """
+        Initialize the system
+        :param storage: The storage to use
+        :param database: The database to use
+        """
         self._storage = storage
         self._database = database
         self._registry = ArtifactRegistry(database, storage)
 
     @staticmethod
     def get_instance():
+        """Get the instance of the AutoMLSystem"""
         if AutoMLSystem._instance is None:
             AutoMLSystem._instance = AutoMLSystem(
                 LocalStorage("./assets/objects"),
@@ -99,4 +123,5 @@ class AutoMLSystem:
 
     @property
     def registry(self):
+        """Get the registry of the AutoMLSystem"""
         return self._registry

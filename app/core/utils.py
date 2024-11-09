@@ -19,8 +19,12 @@ from app.core.system import AutoMLSystem
 
 
 def get_model_parameter_mapping() -> dict:
-    """ Returns a dictionary mapping model names to model classes and
-    hyperparameters. """
+    """
+    Returns a dictionary mapping model names to model classes and
+    hyperparameters.
+    :returns: A dictionary mapping model names to model classes and
+    hyperparameters.
+    """
     model_mapping = {
         "Multiple Linear Regression": (MultipleLinearRegression, {}),
         "Multiple Logistic Regression": (MultipleLogisticRegressor, {
@@ -75,7 +79,11 @@ def reset_pipeline() -> None:
 
 
 def select_dataset(automl) -> pd.DataFrame | None:
-    """ Selects a dataset from the AutoML system and returns it. """
+    """
+    Selects a dataset from the AutoML system and returns it.
+    :param automl: The AutoML system instance
+    :returns: The selected dataset or None if not selected
+    """
     st.subheader("1. Select a Dataset")
     datasets = automl.registry.list(type="dataset")
     if datasets:
@@ -90,7 +98,11 @@ def select_dataset(automl) -> pd.DataFrame | None:
 
 
 def try_convert(value: str) -> float | str:
-    """ Converts values to numeric if possible, otherwise returns as is """
+    """
+    Converts values to numeric if possible, otherwise returns as is
+    :param value: The value to be converted
+    :returns: The converted value or the original value if conversion fails
+    """
     try:
         return pd.to_numeric(value, errors='raise')
     except ValueError:
@@ -98,7 +110,12 @@ def try_convert(value: str) -> float | str:
 
 
 def handle_nan_values(df) -> tuple[pd.DataFrame, dict]:
-    """Handle NaN values based on user input."""
+    """
+    Handle NaN values based on user input.
+    :param df: The dataset
+    :returns: A tuple containing the modified dataframe and a dictionary
+    containing the summary of NaN handling
+    """
     initial_nan_count = df.isna().sum().sum()  # Initial count of NaN values
     st.write(f"There are {initial_nan_count} NaN values in the dataset.")
 
@@ -146,6 +163,7 @@ def select_features_and_target(df) -> tuple[list[Feature], Feature]:
     """
     Selects features and target from the dataset.
     :param df: The dataset
+    :returns: A tuple containing the selected features and target
     """
     st.subheader("2. Select Features and Target")
     features = list(df.columns)
@@ -166,7 +184,10 @@ def select_features_and_target(df) -> tuple[list[Feature], Feature]:
 
 
 def revert_task_type(task_type) -> None:
-    """ Reverts the model task type """
+    """
+    Reverts the model task type
+    :param task_type: The task type
+    """
     st.session_state.training_done = False
     if task_type == "Classification":
         st.session_state.task_type = "Regression"
@@ -191,6 +212,7 @@ def choose_model(df, task_type) -> AutoMLSystem:
     Selects a model based on user input.
     :param df: The dataset
     :param task_type: The task type
+    :returns: The selected model
     """
     st.subheader("3. Choose Model Type")
     model_mapping = get_model_parameter_mapping()
@@ -239,6 +261,7 @@ def select_metrics(task_type) -> list:
     """
     Selects evaluation metrics based on user input.
     :param task_type: The task type
+    :returns: The selected metrics
     """
     st.subheader("5. Choose Evaluation Metrics")
     metrics = ["Accuracy", "Recall", "Precision", "F1"
@@ -254,13 +277,19 @@ def select_metrics(task_type) -> list:
 
 
 def display_pipeline_summary(pipeline) -> None:
-    """ Displays the pipeline summary. """
+    """
+    Displays the pipeline summary.
+    :param pipeline: The pipeline
+    """
     st.subheader("Pipeline Summary")
     st.write(str(pipeline))
 
 
 def train_pipeline(pipeline) -> None:
-    """ Trains the pipeline. """
+    """
+    Trains the pipeline.
+    :param pipeline: The pipeline
+    """
     results = pipeline.execute()
     if results:
         st.subheader("Evaluation Results")
@@ -274,7 +303,11 @@ def train_pipeline(pipeline) -> None:
 
 
 def serialize_pipeline_data(pipeline) -> bytes:
-    """Serialize pipeline artifacts, model, and metrics."""
+    """
+    Serialize pipeline artifacts, model, and metrics.
+    :param pipeline: The pipeline to serialize
+    :returns: The serialized pipeline
+    """
 
     artifacts_data = {
         'model': pipeline.model,
@@ -286,7 +319,11 @@ def serialize_pipeline_data(pipeline) -> bytes:
 
 
 def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
-    """ Save the pipeline as an artifact. """
+    """
+    Save the pipeline as an artifact.
+    :param automl: The AutoMLSystem instance
+    :param pipeline: The pipeline to save
+    """
     with st.form("save_pipeline"):
         pl_name = st.text_input("Enter a name for the pipeline:")
         pl_version = st.text_input("Enter a version for the pipeline:")

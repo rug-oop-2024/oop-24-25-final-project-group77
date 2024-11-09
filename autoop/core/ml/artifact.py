@@ -7,7 +7,7 @@ class Artifact():
     """ A class to represent an ML artifact"""
     def __init__(self, name: str, asset_path: str = "", version: str = "",
                  data: bytes = b"", metadata: dict = {}, type: str = "",
-                 tags: list = []):
+                 tags: list = []) -> None:
         """
         Initialize the artifact
         Args:
@@ -44,12 +44,14 @@ class Artifact():
         return f"{base64_asset_path}-{self.version}"
 
     def read(self) -> bytes:
-        """ Returns data stored in the artifact"""
+        """ Returns data as bytes stored in the artifact"""
         return self.data
 
     def save(self, data: bytes) -> None:
         """
         Save the artifact's data to the specified asset path.
+        Args:
+            data (bytes): The data to be saved
         """
         self.data = data
         os.makedirs(os.path.dirname(self.asset_path), exist_ok=True)

@@ -35,7 +35,11 @@ CLASSIFICATION_MODELS_DICT = {
 
 
 def get_model(model_name: str) -> Model:
-    """ Factory method to get a model by name. """
+    """
+    Factory method to get a model by name.
+    :param model_name: Name of the model to get
+    :return: Model object
+    """
     if model_name not in REGRESSION_MODELS + CLASSIFICATION_MODELS:
         print(f"Model {model_name} is not yet implemented.")
         return None

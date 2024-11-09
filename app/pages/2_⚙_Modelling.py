@@ -20,7 +20,8 @@ from app.core.utils import (
 st.set_page_config(page_title="Modelling", page_icon="📈")
 
 
-def write_header():
+def write_header() -> None:
+    """ Writes the header for the page. """
     st.title("⚙ Modeling Pipeline")
     st.write("Set up and train a model pipeline with your dataset.")
     st.write("If you ever want to reset the pipeline, "

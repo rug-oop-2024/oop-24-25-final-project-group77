@@ -38,6 +38,9 @@ class MultipleLogisticRegressor(Model):
         Validates the parameters for the model.
         Replaces every wrong parameter with its default
         value while informing the user of the change.
+        :param C: Inverse of regularization strength
+        :param penalty: Type of regularization
+        :returns: validated parameters
         """
         if not isinstance(C, float):
             print("C, the regularization parameter, must be a float. "
@@ -79,5 +82,8 @@ class MultipleLogisticRegressor(Model):
 
     @property
     def model(self) -> 'MultipleLogisticRegressor':
-        """ Returns a copy of model to prevent leakage. """
+        """
+        Returns a copy of model to prevent leakage.
+        :returns: model
+        """
         return deepcopy(self._model)

@@ -44,6 +44,11 @@ class SVMClassifier(Model):
         Validates the parameters for the model.
         Replaces every wrong parameter with its default
         value while informing the user of the change.
+        :param C: Inverse of regularization strength
+        :param kernel: Type of kernel
+        :param degree: Degree of polynomial kernel
+        :param gamma: Kernel coefficient
+        :returns: validated parameters
         """
         if not isinstance(C, float):
             print("C, the regularization parameter, must be a float. "
@@ -102,5 +107,8 @@ class SVMClassifier(Model):
 
     @property
     def model(self) -> 'SVMClassifier':
-        """ Returns a copy of model to prevent leakage. """
+        """
+        Returns a copy of model to prevent leakage. \
+        :returns: model
+        """
         return deepcopy(self._model)

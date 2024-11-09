@@ -30,6 +30,9 @@ class Metric(ABC):
         Allows for calling the metric.
         Calls ValueErrors if y_true and y_pred are not numpy arrays
         of the same size.
+        :param y_true: true labels
+        :param y_pred: predicted labels
+        :return: calculated metric
         """
         if not isinstance(y_true, np.ndarray):
             raise ValueError("y_true must be a numpy array")

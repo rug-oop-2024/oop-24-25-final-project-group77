@@ -50,7 +50,10 @@ class Dataset(Artifact):
         )
 
     def read(self) -> pd.DataFrame:
-        """ Returns the data read from a given path """
+        """
+        eturns the data read from a given path
+        :returns: pandas dataframe containing the data
+        """
         bytes = super().read()
         csv = bytes.decode()
         return pd.read_csv(io.StringIO(csv))
@@ -59,6 +62,7 @@ class Dataset(Artifact):
         """
         Save data to a given path
         :param data: data to be saved
+        :returns: bytes
         """
         bytes = data.to_csv(index=False).encode()
         return super().save(bytes)

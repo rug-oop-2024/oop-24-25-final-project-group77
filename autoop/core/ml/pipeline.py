@@ -40,6 +40,10 @@ class Pipeline:
             )
 
     def __str__(self) -> str:
+        """
+        Returns a string representation of the pipeline.
+        :return: string representation of the pipeline
+        """
         input_features_str = "\n    - ".join(map(str, self._input_features))
         metrics_str = "\n    - ".join(map(str, self._metrics))
 
@@ -160,7 +164,10 @@ class Pipeline:
         self._predictions = predictions
 
     def execute(self) -> dict:
-        """ Execute the pipeline. """
+        """
+        Execute the pipeline.
+        :return: a dictionary containing the metrics and predictions
+        """
         self._preprocess_features()
         self._split_data()
         self._train()
@@ -172,7 +179,7 @@ class Pipeline:
 
     @staticmethod
     def from_pipeline(
-        pipeline: "Pipeline", name: str, version: str, asset_path: str, 
+        name: str, version: str, asset_path: str,
         serialized_pipeline: bytes
          ) -> Artifact:
         """
@@ -184,7 +191,6 @@ class Pipeline:
         :return: an Artifact instance representing the serialized pipeline
         """
 
-        # Create and return an Artifact instance
         return Artifact(
             name=name,
             version=version,

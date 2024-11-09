@@ -22,7 +22,11 @@ class KNearestNeighbors(Model):
         self.k = self._validate_hyperparameters(k)
 
     def _validate_hyperparameters(self, v: int) -> int:
-        """ Validate k to ensure that it is an int larger than 0. """
+        """
+        Validate k to ensure that it is an int larger than 0.
+        :param v: number of neighbours considered to classify the input
+        :returns: validated k
+        """
         if not isinstance(v, int):
             print('K must be an integer. Setting to default value 3')
             v = 3
@@ -37,6 +41,7 @@ class KNearestNeighbors(Model):
         Getter for the number of nearest neighbours.
         The getter is used as this model allows dynamic modification
         of its hyperparameters, as they are not used in training.
+        :returns: number of nearest neighbours
         """
         return self._k
 

@@ -54,6 +54,11 @@ class XGBRegressor(Model):
         Validates the parameters for the model.
         Replaces every wrong parameter with its default
         value while informing the user of the change.
+        :param max_depth: Maximum depth
+        :param learning_rate: Learning rate
+        :param n_estimators: Number of estimators
+        :param gamma: Minimum loss reduction
+        :returns: validated parameters
         """
         if not isinstance(max_depth, int):
             print("Max depth must be an integer. Setting to default value 6")
@@ -112,5 +117,8 @@ class XGBRegressor(Model):
 
     @property
     def model(self) -> 'XGBRegressor':
-        """ Returns a copy of model to prevent leakage. """
+        """
+        Returns a copy of model to prevent leakage.
+        :returns: model
+        """
         return deepcopy(self._model)

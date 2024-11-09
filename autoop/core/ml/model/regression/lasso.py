@@ -28,6 +28,7 @@ class Lasso(Model):
     def _validate_hyperparameters(self, alpha: float) -> float:
         """
         Validate the regularization strength
+        :param alpha: Regularization strength
         """
         if alpha < 0.0:
             print("Regularization strength must be positive.",
@@ -58,5 +59,8 @@ class Lasso(Model):
 
     @property
     def model(self) -> 'Lasso':
-        """ Returns a copy of model to prevent leakage. """
+        """
+        Returns a copy of model to prevent leakage.
+        :returns: model
+        """
         return deepcopy(self._model)
