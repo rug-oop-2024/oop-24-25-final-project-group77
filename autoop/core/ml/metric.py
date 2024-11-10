@@ -152,8 +152,9 @@ class Recall(Metric):
         # Apply weighting (standard way of handling multiclass problems)
         number_of_predictions = len(y_pred)
         weighted_recall = (
-            np.sum(np.array(recall_scores) * np.array(class_instances))
-            / number_of_predictions
+            np.sum(
+                np.array(recall_scores) * np.array(class_instances)
+                ) / number_of_predictions
         )
 
         return weighted_recall
@@ -194,8 +195,9 @@ class Precision(Metric):
         # Apply weighting (standard way of handling multiclass problems)
         number_of_predictions = len(y_pred)
         weighted_precision = (
-            np.sum(np.array(precision_scores) * np.array(class_instances))
-            / number_of_predictions
+            np.sum(
+                np.array(precision_scores) * np.array(class_instances)
+                ) / number_of_predictions
         )
 
         return weighted_precision
