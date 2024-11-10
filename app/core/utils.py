@@ -223,9 +223,15 @@ def choose_model(df, task_type) -> AutoMLSystem:
     if df.isna().sum().sum() > 0:
         st.warning("As there are still NA values, model "
                    "selection is restricted")
-        model_choices = [" None - remove NA values",] \
+        model_choices = [" None",] \
             if st.session_state.task_type == "Classification" else \
                         ["XGBoost Regressor"]
+        if model_choices[0] == " None":
+            st.warning("There are no models avaliable that can "
+                       "handle missing values with classification."
+                       " Please choose different task type with "
+                       "the features (detect task type) or reset pipeline.")
+            st.stop()
     else:
         model_choices = [
             "K Nearest Neighbours", "Support Vector Machine",
@@ -237,9 +243,9 @@ def choose_model(df, task_type) -> AutoMLSystem:
     st.session_state.model_choices = model_choices
     st.write("Choose the model from the dropdown below.")
     st.info("If you believe the automatically detected task is wrong, \
-             click the button bellow.")
+             click the button below.")
     if st.button("Switch model tasks"):
-        st.warning("Misspecified model task may cause the pipeline to fail."
+        st.warning("Misspecified model task may cause the pipeline to fail. "
                    "Please choose the correct task type.")
         revert_task_type(task_type)
 
@@ -410,6 +416,10 @@ def load_pipeline(selected_pipeline: Artifact) -> Pipeline:
 
 def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
     uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
+    st.warning("The CSV file must have the same target features"
+            " and input features as the original pipeline."
+            " Please make note of the pipeline summary "
+            "for this respective features if unsure.")
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
@@ -425,12 +435,11 @@ def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
             version=version
             )
 
-        pipeline._dataset = new_dataset  # need a setter/getter?!?!
-        # features of pipeline seem to cause issue w/ preprocessing
-        # probably need to replace features with the uploaded ones
-
-        input_features, target_feature = select_features_and_target(
-            new_dataset)  # finish this
-
-        results = pipeline.execute()
-        return results
+        try:
+            pipeline.dataset = new_dataset
+            results = pipeline.execute()
+            st.success("Prediction completed successfully!")
+            return results
+        except Exception as e:
+            st.error("Error! Make sure your dataset has "
+                     f"the same input and target features: {str(e)}")
