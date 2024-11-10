@@ -491,8 +491,8 @@ def generate_experiment_report(results: dict) -> None:
         for _, row in metrics_df.iterrows():
             st.write(f"**{row['Metric Name']}**")
             st.write(f"- {row['Phase']} Train Score: {row['Train Score']:.5f}")
-            st.write(f"- {row['Test Phase']} Test Score: {row['Test Score'
-                                                              ]:.5f}")
+            st.write(f"- {row['Test Phase']} "
+                     f"Test Score: {row['Test Score']:.5f}")
 
         # Allow metrics to be downloaded
         metrics_csv = metrics_df.to_csv(index=False)
