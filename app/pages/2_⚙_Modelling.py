@@ -15,7 +15,8 @@ from app.core.utils import (
     display_pipeline_summary,
     train_pipeline,
     reset_pipeline,
-    save_pipeline
+    save_pipeline,
+    generate_experiment_report
 )
 
 st.set_page_config(page_title="Modelling", page_icon="📈")
@@ -118,6 +119,16 @@ else:
     display_pipeline_summary(pipeline)
 
     if st.button("Train Pipeline") or st.session_state.training_done:
-        train_pipeline(pipeline)
+        results = train_pipeline(pipeline)
         st.session_state.training_done = True
-        save_pipeline(automl, pipeline)
+        if results is not None:
+            save_pipeline(automl, pipeline)
+
+            st.subheader("Experiment Report")
+            st.write("Here you can generate a detailed report for your "
+                     " experiment."
+                     " It will include graphs, metrics, and other information."
+                     " You can download these as necessary.")
+            if st.button("Generate Report"):
+                st.success("Report generated!")
+                generate_experiment_report(results)

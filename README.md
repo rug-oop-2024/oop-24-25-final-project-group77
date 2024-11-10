@@ -179,16 +179,16 @@ If you did not implement the feature
 | `ST/modelling/pipeline/save`          | FN           | Both                       |    X     | |
 | `ST/page/deployment`                  | FN           | Hunter                     |    X     | |
 | `ST/deployment/load`                  | FN           | Hunter                     |    X     | |
-| `ST/deployment/predict`               | FN           |                      |         | |
+| `ST/deployment/predict`               | FN           | Hunter                     |    X     | |
 
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|---------|-----|
-| Handling NaN values          | FN           | Both                     |    X     | We did implement this however, for some datasets the training on the kept NaN values does not work. We tried to fix this for multiple days, but did not succeed. |
+| Handling NaN values          | FN           | Both                     |    X     | We did implement this as much as possible as this was a difficult tasks that we took up as an extra feature. We allowed for the user to either handle the NaN values with: remove, interpolate, fill with 0 or keep. All the methods do train and provide results to the user. We tested this as much as possible and there may be some errors, but with the respective testing we did it works well enough. |
 |  Deleting datasets on page        | FN          |  Both                   |  X       | |
 |  Accounting for categorical numerical features       |   FN        |     Lukasz               |    X     |  Added the ability to switch between task types if user believes the automated task selection is wrong.|
 |  Resetting the pipeline       |     FN      |    Hunter                 |      X   | Added the ability to start over the pipeline for user friendliness for multiple concurrent pipeline applications.|
-|         |           |                     |         | |
+| Generate report        |    FN       |        Hunter             |    X     | As suggested in the README.md we could generate a report. We did decide to do this so the user could generate the graphs and an overview of the results from training the pipeline. We also went a step further and made sure that the user can download the different sections of the report as this might be handy to the user. | 
 |         |           |                     |         | |
 |         |           |                     |         | |
 |         |           |                     |         | |

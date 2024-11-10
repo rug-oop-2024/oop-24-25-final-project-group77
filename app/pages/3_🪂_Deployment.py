@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 from app.core.system import AutoMLSystem
 from app.core.utils import (
@@ -33,6 +34,8 @@ if results is not None:
         st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
         st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
         st.write("\n")
-    st.write("Predictions:")
+    st.write("**Predictions:**")
     predictions = results["predictions"]
-    st.dataframe(predictions)
+    prediction_results = pd.DataFrame(predictions, columns=[
+        "Predicted Values"])
+    st.write(prediction_results)

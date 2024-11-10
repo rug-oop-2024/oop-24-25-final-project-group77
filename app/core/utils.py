@@ -5,6 +5,10 @@ Module for storing multiple utilities necessary for clean code in the pages
 import pickle
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import io
+
 
 from autoop.core.ml.model.classification import MultipleLogisticRegressor
 from autoop.core.ml.model.classification import SVMClassifier
@@ -294,25 +298,31 @@ def display_pipeline_summary(pipeline) -> None:
     st.write(str(pipeline))
 
 
-def train_pipeline(pipeline) -> None:
+def train_pipeline(pipeline) -> dict:
     """
     Trains the pipeline and reports the results.
     :param pipeline: The pipeline
     """
-    results = pipeline.execute()
-    if results:
-        st.subheader("Evaluation Results")
-        st.success("Training complete!")
-        for metric_result in results["metrics"]:
-            metric_name = metric_result[1].__class__.__name__
-            st.write(f"**Metric**: {metric_name}")
-            st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
-            st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
-            st.write("\n")
-        st.write("Example predictions:")
-        predictions = results["predictions"]
-        prediction_results = pd.DataFrame(predictions)
-        st.write(prediction_results)
+    try:
+        results = pipeline.execute()
+        if results:
+            st.subheader("Evaluation Results")
+            st.success("Training complete!")
+            for metric_result in results["metrics"]:
+                metric_name = metric_result[1].__class__.__name__
+                st.write(f"**Metric**: {metric_name}")
+                st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
+                st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
+                st.write("\n")
+            st.write("**Predictions:**")
+            predictions = results["predictions"]
+            prediction_results = pd.DataFrame(predictions, columns=[
+                "Predicted Values"])
+            st.write(prediction_results)
+
+            return results
+    except Exception as e:
+        st.error(f"Training failed, please reset pipeline: {e}")
 
 
 def serialize_pipeline_data(pipeline: Pipeline) -> bytes:
@@ -339,6 +349,8 @@ def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
     :param automl: The AutoMLSystem instance
     :param pipeline: The pipeline to save
     """
+    st.subheader("6. Save Pipeline")
+    st.write("Here you may save your pipeline for future use.")
     with st.form("save_pipeline"):
         pl_name = st.text_input("Enter a name for the pipeline:")
         pl_version = st.text_input("Enter a version for the pipeline:")
@@ -415,11 +427,16 @@ def load_pipeline(selected_pipeline: Artifact) -> Pipeline:
 
 
 def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
+    """
+    Predict using the loaded pipeline.
+    :param pipeline: The pipeline to use for prediction
+    :returns: The predicted values
+    """
     uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
     st.warning("The CSV file must have the same target features"
-            " and input features as the original pipeline."
-            " Please make note of the pipeline summary "
-            "for this respective features if unsure.")
+               " and input features as the original pipeline."
+               " Please make note of the pipeline summary "
+               "for this respective features if unsure.")
 
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
@@ -443,3 +460,79 @@ def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
         except Exception as e:
             st.error("Error! Make sure your dataset has "
                      f"the same input and target features: {str(e)}")
+
+
+def generate_experiment_report(results: dict) -> None:
+    """
+    Generates a detailed experiment report with graphs,
+    metrics, and other relevant information.
+    :param results: A dictionary containing the results
+    from the trained pipeline.
+    """
+    if not results:
+        st.warning("No results available to generate the report.")
+        return
+
+    # Section 1: Display Metrics
+    st.subheader("Evaluation Metrics")
+    if "metrics" in results:
+        metrics_data = [
+            (metric[0], metric[1].__class__.__name__, metric[2], metric[3],
+             metric[4], metric[5])
+            for metric in results["metrics"]
+        ]
+        metrics_df = pd.DataFrame(metrics_data, columns=["Phase",
+                                                         "Metric Name",
+                                                         "Train Score",
+                                                         "Test Phase",
+                                                         "Metric Object",
+                                                         "Test Score"])
+
+        for _, row in metrics_df.iterrows():
+            st.write(f"**{row['Metric Name']}**")
+            st.write(f"- {row['Phase']} Train Score: {row['Train Score']:.5f}")
+            st.write(f"- {row['Test Phase']} Test Score: {row['Test Score'
+                                                              ]:.5f}")
+
+        # Allow metrics to be downloaded
+        metrics_csv = metrics_df.to_csv(index=False)
+        st.download_button(
+            label="Download Metrics Report as CSV",
+            data=metrics_csv,
+            file_name="metrics_report.csv",
+            mime="text/csv"
+        )
+
+    # Section 2: Display Predictions
+    st.subheader("Predictions Overview")
+    if "predictions" in results:
+        predictions = results["predictions"]
+        prediction_df = pd.DataFrame(predictions, columns=["Predicted Values"])
+        st.write(prediction_df.head())
+
+        # Here we create a histogram of the predicted values
+        fig, ax = plt.subplots()
+        sns.histplot(prediction_df["Predicted Values"], kde=True, ax=ax)
+        ax.set_title("Distribution of Predicted Values")
+        st.pyplot(fig)
+
+        # Allow it to be downloadable since user might want it
+        img_buffer = io.BytesIO()
+        fig.savefig(img_buffer, format="png")
+        img_buffer.seek(0)  #
+
+        st.download_button(
+            label="Download Prediction Distribution Plot as PNG",
+            data=img_buffer,
+            file_name="prediction_distribution.png",
+            mime="image/png"
+        )
+
+        # Allow predicitions to be downloaded
+        predictions_csv = prediction_df.to_csv(index=False)
+        st.download_button(
+            label="Download Predictions as CSV",
+            data=predictions_csv,
+            file_name="predictions.csv",
+            mime="text/csv"
+        )

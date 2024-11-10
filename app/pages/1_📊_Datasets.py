@@ -42,7 +42,7 @@ if datasets:
         if st.button("Confirm Deletion"):
             st.write(f"Deleting {selected_dataset_name}")
             artifact_id = selected_dataset.id
-            automl.registry.delete(artifact_id)  # issue
+            automl.registry.delete(artifact_id)
             st.warning(f"Deleted {selected_dataset_name}")
             st.session_state.confirm_delete = False
             st.rerun()
@@ -53,6 +53,7 @@ if datasets:
 else:
     st.info("No datasets available in the system. Please upload one.")
 
+# Initialize upload success flag
 if "upload_success" not in st.session_state:
     st.session_state.upload_success = False
 
@@ -77,8 +78,6 @@ if uploaded_file:
 
         if st.button("Confirm Upload"):
             automl.registry.register(new_dataset)
-            st.success(f"Uploaded and registered {uploaded_file.name} "
-                       "successfully!")
             st.session_state.upload_success = True
 
             st.session_state.uploaded_file = None
@@ -86,3 +85,8 @@ if uploaded_file:
 
     except Exception as e:
         st.error(f"Failed to upload dataset: {e}")
+
+# Display success message iff upload was successful and confirmed
+if st.session_state.upload_success:
+    st.success("Dataset uploaded successfully!")
+    st.session_state.upload_success = False
