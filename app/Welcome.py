@@ -15,6 +15,10 @@ st.write(
     - **Select Dataset**: Select a dataset from the app.
     - **Train Model**: Train a model on the selected dataset.
     - **Deploy Model**: Deploy the trained model for prediction.
+
+    **Note**: There are datasets provided in the repository which are
+    available to use. You can also upload your own dataset and use
+    that instead!
     """
 )
 
