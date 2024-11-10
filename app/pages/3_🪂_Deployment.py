@@ -6,7 +6,7 @@ from app.core.utils import (
     select_pipeline,
     load_pipeline,
     predict_pipeline
-    )
+                            )
 
 # Initialize AutoML system instance
 automl = AutoMLSystem.get_instance()
