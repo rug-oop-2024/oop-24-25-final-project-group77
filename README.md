@@ -1,3 +1,4 @@
+
 # AutOOP your first AutoML library
 
 🎉🥳 Congratulations on making it to this final project! We are excited to see what you can do.
@@ -60,7 +61,7 @@ You can try implementing the one of the following, we will give a max of 2 point
 * Support target types of image, text, video, audio.
 * Support time-series data (with the aforementioned column types) where a user can choose the time column.
 * Support what-if analysis (e.g., user can change the input and see the output).
-* Support metric optimization (e.g., select certain inputs to be adjusted to maximise the target column (e.g., maximise conversion).
+* Support metric optimization (e.g., select certain inputs to be adjusted to maximise the target column (e.g., maximise conversion)).
 * Create a prediction code generator for a specific model.
 * Auto hyperparameter search/tuning.
 
@@ -151,34 +152,51 @@ If the feature has been implemented by both students, write `both`.
 
 If you did not implement the feature
 
+**Note: For some we did edit (but not fully implement) pieces of each others code. We balanced the work as much as possible. 
+
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|--------------------------|---------|         
-| Up-to-date requirements.txt           | NF           |                      |         | |
-| `ML/detect-features`                  | FN           |                      |         | |
-| `ML/artifact`                         | NF           |                      |         | |
-| `ML/feature`                          | NF           |                      |         | |
-| `ML/metric`                           | NF           |                      |         | |
-| `ML/metric/extensions`                | FN           |                      |         | |
-| `ML/model`                            | NF           |                      |         | |
-| `ML/model/extensions`                 | FN           |                      |         | |
-| `ML/pipeline/evaluation`              | FN           |                      |         | | 
-| `ST/page/datasets`                    | NF           |                      |         | |
-| `ST/datasets/management/create`       | FN           |                      |         | |
-| `ST/datasets/management/save`         | FN           |                      |         | |
-| `ST/page/modelling`                   | NF           |                      |         | |
-| `ST/modelling/datasets/list`          | FN           |                      |         | |
-| `ST/modelling/datasets/features`      | FN           |                      |         | |
-| `ST/modelling/models`                 | FN           |                      |         | |
-| `ST/modelling/pipeline/split`         | FN           |                      |         | |
-| `ST/modelling/pipeline/metrics`       | FN           |                      |         | |
-| `ST/modelling/pipeline/summary`       | FN           |                      |         | |
-| `ST/modelling/pipeline/train`         | FN           |                      |         | |
-| `ST/modelling/pipeline/save`          | FN           |                      |         | |
-| `ST/page/deployment`                  | FN           |                      |         | |
-| `ST/deployment/load`                  | FN           |                      |         | |
-| `ST/deployment/predict`               | FN           |                      |         | |
+| Up-to-date requirements.txt           | NF           | Both                       |    X     | |
+| `ML/detect-features`                  | FN           | Both                       |    X     | |
+| `ML/artifact`                         | NF           | Lukasz                     |    X     | |
+| `ML/feature`                          | NF           | Lukasz                     |    X     | |
+| `ML/metric`                           | NF           | Lukasz                     |    X     | |
+| `ML/metric/extensions`                | FN           | Lukasz                     |    X     | |
+| `ML/model`                            | NF           | Lukasz                     |    X     | |
+| `ML/model/extensions`                 | FN           | Lukasz                     |    X     | |
+| `ML/pipeline/evaluation`              | FN           | Both                       |    X     | | 
+| `ST/page/datasets`                    | NF           | Hunter                     |    X     | |
+| `ST/datasets/management/create`       | FN           | Hunter                     |    X     | |
+| `ST/datasets/management/save`         | FN           | Both                       |    X     | |
+| `ST/page/modelling`                   | NF           | Both                       |    X     | |
+| `ST/modelling/datasets/list`          | FN           | Hunter                     |    X     | |
+| `ST/modelling/datasets/features`      | FN           | Hunter                     |    X     | |
+| `ST/modelling/models`                 | FN           | Both                       |    X     | |
+| `ST/modelling/pipeline/split`         | FN           | Hunter                     |    X     | |
+| `ST/modelling/pipeline/metrics`       | FN           | Hunter                     |    X     | |
+| `ST/modelling/pipeline/summary`       | FN           | Hunter                     |    X     | |
+| `ST/modelling/pipeline/train`         | FN           | Both                       |    X     | |
+| `ST/modelling/pipeline/save`          | FN           | Both                       |    X     | |
+| `ST/page/deployment`                  | FN           | Hunter                     |    X     | |
+| `ST/deployment/load`                  | FN           | Hunter                     |    X     | |
+| `ST/deployment/predict`               | FN           | Hunter                     |    X     | |
 
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|---------|-----|
-|           |            |                      |         | |
+| Handling NaN values          | FN           | Both                     |    X     | We did implement this as much as possible as this was a difficult tasks that we took up as an extra feature. We allowed for the user to either handle the NaN values with: remove, interpolate, fill with 0 or keep. All the methods do train and provide results to the user. We tested this as much as possible and there may be some errors, but with the respective testing we did it works well enough. |
+|  Deleting datasets on page        | FN          |  Both                   |  X       | |
+|  Accounting for categorical numerical features       |   FN        |     Lukasz               |    X     |  Added the ability to switch between task types if user believes the automated task selection is wrong.|
+|  Resetting the pipeline       |     FN      |    Hunter                 |      X   | Added the ability to start over the pipeline for user friendliness for multiple concurrent pipeline applications.|
+| Generate report        |    FN       |        Hunter             |    X     | As suggested in the README.md we could generate a report. We did decide to do this so the user could generate the graphs and an overview of the results from training the pipeline. We also went a step further and made sure that the user can download the different sections of the report as this might be handy to the user. | 
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+|         |           |                     |         | |
+
