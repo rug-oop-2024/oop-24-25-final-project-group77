@@ -5,7 +5,6 @@ Module for storing multiple utilities necessary for clean code in the pages
 import pickle
 import streamlit as st
 import pandas as pd
-import io
 
 from autoop.core.ml.model.classification import MultipleLogisticRegressor
 from autoop.core.ml.model.classification import SVMClassifier
@@ -162,7 +161,8 @@ def handle_nan_values(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     return df, {}
 
 
-def select_features_and_target(df: pd.DataFrame) -> tuple[list[Feature], Feature]:
+def select_features_and_target(df: pd.DataFrame) -> tuple[list[Feature],
+                                                          Feature]:
     """
     Selects features and target from the dataset.
     :param df: The dataset
@@ -303,6 +303,7 @@ def train_pipeline(pipeline) -> None:
             st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
             st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
             st.write("\n")
+        st.write("Example predictions:")
         predictions = results["predictions"]
         prediction_results = pd.DataFrame(predictions)
         st.write(prediction_results)

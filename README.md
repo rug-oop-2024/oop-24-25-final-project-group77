@@ -157,21 +157,21 @@ If you did not implement the feature
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|--------------------------|---------|         
 | Up-to-date requirements.txt           | NF           | Both                       |    X     | |
-| `ML/detect-features`                  | FN           | Lukasz                     |    X     | |
+| `ML/detect-features`                  | FN           | Both                       |    X     | |
 | `ML/artifact`                         | NF           | Lukasz                     |    X     | |
 | `ML/feature`                          | NF           | Lukasz                     |    X     | |
 | `ML/metric`                           | NF           | Lukasz                     |    X     | |
 | `ML/metric/extensions`                | FN           | Lukasz                     |    X     | |
 | `ML/model`                            | NF           | Lukasz                     |    X     | |
 | `ML/model/extensions`                 | FN           | Lukasz                     |    X     | |
-| `ML/pipeline/evaluation`              | FN           | Lukasz                     |    X     | | 
+| `ML/pipeline/evaluation`              | FN           | Both                       |    X     | | 
 | `ST/page/datasets`                    | NF           | Hunter                     |    X     | |
 | `ST/datasets/management/create`       | FN           | Hunter                     |    X     | |
-| `ST/datasets/management/save`         | FN           | Hunter                     |    X     | |
-| `ST/page/modelling`                   | NF           | Hunter                     |    X     | |
+| `ST/datasets/management/save`         | FN           | Both                       |    X     | |
+| `ST/page/modelling`                   | NF           | Both                       |    X     | |
 | `ST/modelling/datasets/list`          | FN           | Hunter                     |    X     | |
 | `ST/modelling/datasets/features`      | FN           | Hunter                     |    X     | |
-| `ST/modelling/models`                 | FN           | Hunter                     |    X     | |
+| `ST/modelling/models`                 | FN           | Both                       |    X     | |
 | `ST/modelling/pipeline/split`         | FN           | Hunter                     |    X     | |
 | `ST/modelling/pipeline/metrics`       | FN           | Hunter                     |    X     | |
 | `ST/modelling/pipeline/summary`       | FN           | Hunter                     |    X     | |

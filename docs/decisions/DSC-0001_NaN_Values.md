@@ -1,4 +1,4 @@
-# DSC-0002: Handle NaN Values in Pipeline Training for Regression and Classification
+# DSC-0001: Handle NaN Values in Pipeline Training for Regression and Classification
 # Date: 2024-11-09
 # Decision: Handle NaN values in pipeline training for regression and classification tasks
 # Status: Accepted
