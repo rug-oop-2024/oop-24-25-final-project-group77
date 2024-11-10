@@ -196,7 +196,7 @@ class Pipeline:
     def from_pipeline(
         name: str, version: str, asset_path: str,
         serialized_pipeline: bytes
-            ) -> Artifact:
+    ) -> Artifact:
         """
         Create an Artifact from a Pipeline instance.
         :param pipeline: the pipeline instance to be serialized and saved

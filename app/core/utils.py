@@ -96,7 +96,7 @@ def select_dataset(automl) -> pd.DataFrame | None:
         selected_dataset_name = st.selectbox("Select a dataset", dataset_names)
         selected_dataset = next(
             ds for ds in datasets if ds.name == selected_dataset_name
-                                )
+        )
         return selected_dataset
     else:
         st.warning("No datasets available. Please upload one.")
@@ -186,7 +186,7 @@ def select_features_and_target(df: pd.DataFrame) -> tuple[list[Feature],
 
     return [Feature(name=feat, type='categorical' if df[
         feat].dtype == 'object' else 'numerical'
-                    ) for feat in input_features], \
+        ) for feat in input_features], \
         Feature(name=target_feature, type='categorical' if
                 df[target_feature].dtype == 'object' else 'numerical')
 
@@ -240,7 +240,7 @@ def choose_model(df, task_type) -> AutoMLSystem:
         model_choices = [
             "K Nearest Neighbours", "Support Vector Machine",
             "Multiple Logistic Regression"
-                    ] if st.session_state.task_type == "Classification" else [
+        ] if st.session_state.task_type == "Classification" else [
                         "Multiple Linear Regression", "Lasso",
                         "XGBoost Regressor"]
 
@@ -387,7 +387,7 @@ def select_pipeline(automl: AutoMLSystem) -> Pipeline:
                                               pipeline_names)
         selected_pipeline = next(
             ds for ds in pipelines if ds.name == selected_pipeline_name
-                                )
+        )
         return selected_pipeline
     else:
         st.warning("No pipelines available. Please train one and save it!")
@@ -450,7 +450,7 @@ def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
             data=data,
             asset_path=asset_path,
             version=version
-                                            )
+        )
 
         try:
             pipeline.dataset = new_dataset
