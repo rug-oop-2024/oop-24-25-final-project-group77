@@ -66,6 +66,16 @@ class Pipeline:
         return self._model
 
     @property
+    def dataset(self) -> Dataset:
+        """Returns the given dataset."""
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, dataset: Dataset) -> None:
+        """ Sets the dataset of the pipeline """
+        self._dataset = dataset
+
+    @property
     def artifacts(self) -> List[Artifact]:
         """
         Used to get the artifacts generated during the pipeline
