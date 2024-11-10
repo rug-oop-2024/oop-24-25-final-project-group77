@@ -5,6 +5,7 @@ Module for storing multiple utilities necessary for clean code in the pages
 import pickle
 import streamlit as st
 import pandas as pd
+import io
 
 from autoop.core.ml.model.classification import MultipleLogisticRegressor
 from autoop.core.ml.model.classification import SVMClassifier
@@ -14,6 +15,7 @@ from autoop.core.ml.model.regression import XGBRegressor
 from autoop.core.ml.pipeline import Pipeline
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.artifact import Artifact
+from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.metric import get_metric
 from app.core.system import AutoMLSystem
 
@@ -110,7 +112,7 @@ def try_convert(value: str) -> float | str:
         return value
 
 
-def handle_nan_values(df) -> tuple[pd.DataFrame, dict]:
+def handle_nan_values(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """
     Handle NaN values based on user input.
     :param df: The dataset
@@ -160,7 +162,7 @@ def handle_nan_values(df) -> tuple[pd.DataFrame, dict]:
     return df, {}
 
 
-def select_features_and_target(df) -> tuple[list[Feature], Feature]:
+def select_features_and_target(df: pd.DataFrame) -> tuple[list[Feature], Feature]:
     """
     Selects features and target from the dataset.
     :param df: The dataset
@@ -306,20 +308,22 @@ def train_pipeline(pipeline) -> None:
         st.write(prediction_results)
 
 
-def serialize_pipeline_data(pipeline) -> bytes:
+def serialize_pipeline_data(pipeline: Pipeline) -> bytes:
     """
-    Serialize pipeline artifacts, model, and metrics.
+    Serializes the pipeline data into a byte stream.
     :param pipeline: The pipeline to serialize
-    :returns: The serialized pipeline
+    :returns: The serialized data (bytes)
     """
-
-    artifacts_data = {
-        'model': pipeline.model,
-        'artifacts': pipeline.artifacts,
-        'metrics': pipeline._metrics_results
+    data = {
+        "artifacts": dict((artifact.name, artifact.data)
+                          for artifact in pipeline.artifacts),
+        "model": pipeline.model,
+        "metrics": pipeline._metrics
     }
 
-    return pickle.dumps(artifacts_data)
+    serialized_data = pickle.dumps(data)
+
+    return serialized_data
 
 
 def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
@@ -346,3 +350,86 @@ def save_pipeline(automl: AutoMLSystem, pipeline: Pipeline) -> None:
                 st.success(f"Pipeline '{pl_name}' saved successfully!")
             else:
                 st.warning("Please enter a name and version for the pipeline.")
+
+
+def select_pipeline(automl: AutoMLSystem) -> Pipeline:
+    """
+    Load a pipeline from the registry.
+    :param automl: The AutoMLSystem instance
+    :param pl_name: The name of the pipeline to load
+    :param pl_version: The version of the pipeline to load
+    :returns: The loaded pipeline
+    """
+    st.subheader("1. Select a Pipeline")
+    pipelines = automl.registry.list(type="pipeline")
+    if pipelines:
+        pipeline_names = [pipeline.name for pipeline in pipelines]
+        selected_pipeline_name = st.selectbox("Select a dataset",
+                                              pipeline_names)
+        selected_pipeline = next(
+            ds for ds in pipelines if ds.name == selected_pipeline_name
+            )
+        return selected_pipeline
+    else:
+        st.warning("No pipelines available. Please train one and save it!")
+        st.stop()
+
+
+def load_pipeline(selected_pipeline: Artifact) -> Pipeline:
+    """
+    Load a pipeline from the registry.
+    :param selected_pipeline: The pipeline artifact to load
+    :returns: The loaded pipeline
+    """
+    deserialized_data = pickle.loads(selected_pipeline.data)
+    artifacts = deserialized_data['artifacts']
+    pipeline_config = pickle.loads(artifacts['pipeline_config'])
+
+    # Extract configuration details from pipeline_config
+    input_features = pipeline_config['input_features']
+    target_feature = pipeline_config['target_feature']
+    split = pipeline_config['split']
+
+    print("Input Features:", input_features)
+    print("Target Feature:", target_feature)
+    print("Split:", split)
+
+    # Initialize the Pipeline object with the deserialized configuration
+    loaded_pipeline = Pipeline(
+        input_features=input_features,
+        target_feature=target_feature,
+        split=split,
+        model=deserialized_data['model'],
+        metrics=deserialized_data['metrics'],
+        dataset=None
+    )
+
+    return loaded_pipeline
+
+
+def predict_pipeline(pipeline: Pipeline) -> pd.DataFrame:
+    uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
+
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+
+        asset_path = f"csv_files/{uploaded_file.name}"
+        version = "ohio"
+
+        # Create a new Dataset instance
+        new_dataset = Dataset.from_dataframe(
+            name=uploaded_file.name,
+            data=data,
+            asset_path=asset_path,
+            version=version
+            )
+
+        pipeline._dataset = new_dataset  # need a setter/getter?!?!
+        # features of pipeline seem to cause issue w/ preprocessing
+        # probably need to replace features with the uploaded ones
+
+        input_features, target_feature = select_features_and_target(
+            new_dataset)  # finish this
+
+        results = pipeline.execute()
+        return results

@@ -177,8 +177,8 @@ If you did not implement the feature
 | `ST/modelling/pipeline/summary`       | FN           | Hunter                     |    X     | |
 | `ST/modelling/pipeline/train`         | FN           | Both                       |    X     | |
 | `ST/modelling/pipeline/save`          | FN           | Both                       |    X     | |
-| `ST/page/deployment`                  | FN           |                      |         | |
-| `ST/deployment/load`                  | FN           |                      |         | |
+| `ST/page/deployment`                  | FN           | Hunter                     |    X     | |
+| `ST/deployment/load`                  | FN           | Hunter                     |    X     | |
 | `ST/deployment/predict`               | FN           |                      |         | |
 
 If you add extra features, please indicate them below:

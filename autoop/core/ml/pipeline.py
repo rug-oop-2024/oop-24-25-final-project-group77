@@ -49,6 +49,7 @@ class Pipeline:
 
         return (
             f"Pipeline:\n"
+            f"  - Model: {self._model.__class__.__name__}\n"
             f"  - Model Type: {self._model.type}\n"
             f"  - Input Features:\n    - {input_features_str}\n"
             f"  - Target {self._target_feature}\n"
@@ -135,11 +136,13 @@ class Pipeline:
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
         """
         Compact the vectors into a single 2D array.
-        If any vector is 1-dimensional, reshape it to (N, 1) for consistent concatenation.
+        If any vector is 1-dimensional, reshape it to (N, 1)
+        for consistent concatenation.
         :param vectors: list of vectors
         :return: compacted vector
         """
-        reshaped_vectors = [v.reshape(-1, 1) if v.ndim == 1 else v for v in vectors]
+        reshaped_vectors = [v.reshape(-1, 1
+                                      ) if v.ndim == 1 else v for v in vectors]
         return np.concatenate(reshaped_vectors, axis=1)
 
     def _train(self) -> None:
