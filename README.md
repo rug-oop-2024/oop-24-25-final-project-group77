@@ -184,11 +184,10 @@ If you did not implement the feature
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|---------|-----|
-| Handling NaN values          | FN           | Both                     |    X     | We did implement this however, for some datasets the training on the handled data set works |  
-|        |           |                     |         | and some do not. We tried to fix this for 3 days, but did not succeed. |
+| Handling NaN values          | FN           | Both                     |    X     | We did implement this however, for some datasets the training on the kept NaN values does not work. We tried to fix this for multiple days, but did not succeed. |
 |  Deleting datasets on page        | FN          |  Both                   |  X       | |
-|  Accounting for categorical numerical features       |   FN        |     Lukasz               |    X     | | Ability added to switch between task types if user believes it 
-|         |           |                     |         | |
+|  Accounting for categorical numerical features       |   FN        |     Lukasz               |    X     |  Added the ability to switch between task types if user believes the automated task selection is wrong.|
+|  Resetting the pipeline       |     FN      |    Hunter                 |      X   | Added the ability to start over the pipeline for user friendliness for multiple concurrent pipeline applications.|
 |         |           |                     |         | |
 |         |           |                     |         | |
 |         |           |                     |         | |
