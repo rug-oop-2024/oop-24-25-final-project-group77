@@ -18,7 +18,8 @@ def preprocess_features(features: List[Feature], dataset: Dataset
         Each ndarray of shape (N, ...)
     """
     results = []
-    raw = pd.read_csv(io.BytesIO(dataset.read()))
+    raw = pd.read_csv(io.BytesIO(dataset.read())) if isinstance(
+        dataset.read(), bytes) else dataset.read()
 
     for feature in features:
         if feature.type == "categorical":

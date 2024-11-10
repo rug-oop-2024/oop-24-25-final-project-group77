@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 
+from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.pipeline import Pipeline
 from app.core.system import AutoMLSystem
 from app.core.utils import (
@@ -82,6 +83,7 @@ if df.isna().values.any() and not st.session_state.nan_handling_confirmed:
         st.session_state.nan_summary = summary_nan
         st.session_state.nan_handling_confirmed = True
         st.session_state["modified_df"] = df
+
         st.rerun()
 else:
     # If NaN handling was performed, display summary
@@ -90,17 +92,25 @@ else:
         for key, value in st.session_state.nan_summary.items():
             st.write(f"**- {key}:** {value}")
 
+    # Create a new Dataset instance with modified data
+    # If there were NaN values, this is the modified dataset
+    handled_dataset = Dataset.from_dataframe(
+        name="Modified Dataset",
+        data=df,
+        asset_path=None
+    )
+
     input_features, target_feature = select_features_and_target(df)
     if st.button("Detect Target Type") or not st.session_state.task_type:
         st.session_state.task_type = "Classification" if \
             target_feature.type == "categorical" else "Regression"
-    st.info("detected task: " + st.session_state.task_type)
+    st.info("Detected task: " + st.session_state.task_type)
 
     model = choose_model(df, st.session_state.task_type)
     split = set_train_test_split()
     metrics = select_metrics(st.session_state.task_type)
 
-    pipeline = Pipeline(dataset=selected_dataset, model=model,
+    pipeline = Pipeline(dataset=handled_dataset, model=model,
                         input_features=input_features,
                         target_feature=target_feature,
                         metrics=metrics, split=split)

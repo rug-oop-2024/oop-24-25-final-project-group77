@@ -288,7 +288,7 @@ def display_pipeline_summary(pipeline) -> None:
 
 def train_pipeline(pipeline) -> None:
     """
-    Trains the pipeline.
+    Trains the pipeline and reports the results.
     :param pipeline: The pipeline
     """
     results = pipeline.execute()
@@ -301,6 +301,9 @@ def train_pipeline(pipeline) -> None:
             st.write(f"- {metric_result[0]} {metric_result[2]:.5f}")
             st.write(f"- {metric_result[3]} {metric_result[5]:.5f}")
             st.write("\n")
+        predictions = results["predictions"]
+        prediction_results = pd.DataFrame(predictions)
+        st.write(prediction_results)
 
 
 def serialize_pipeline_data(pipeline) -> bytes:
