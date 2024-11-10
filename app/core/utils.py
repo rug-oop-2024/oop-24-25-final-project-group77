@@ -186,7 +186,7 @@ def select_features_and_target(df: pd.DataFrame) -> tuple[list[Feature],
 
     return [Feature(name=feat, type='categorical' if df[
         feat].dtype == 'object' else 'numerical'
-        ) for feat in input_features], \
+    ) for feat in input_features], \
         Feature(name=target_feature, type='categorical' if
                 df[target_feature].dtype == 'object' else 'numerical')
 
@@ -241,8 +241,8 @@ def choose_model(df, task_type) -> AutoMLSystem:
             "K Nearest Neighbours", "Support Vector Machine",
             "Multiple Logistic Regression"
         ] if st.session_state.task_type == "Classification" else [
-                        "Multiple Linear Regression", "Lasso",
-                        "XGBoost Regressor"]
+            "Multiple Linear Regression", "Lasso",
+            "XGBoost Regressor"]
 
     st.session_state.model_choices = model_choices
     st.write("Choose the model from the dropdown below.")
